@@ -12,3 +12,4 @@ Built as part of my 100 Days of Code challenge.
 When pushing Day 3:
 
 Day 3: Add date tracking and streak logic to coding tracker
+WE ARE WINNING TOGETHER
