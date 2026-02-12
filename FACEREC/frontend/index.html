@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Elite Security Facial System</title>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            background: #22c55e;
+            border: none;
+            color: black;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        video {
+            border: 3px solid #22c55e;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Facial Security Dashboard</h1>
+
+<video id="video" width="400" autoplay></video>
+<br>
+<button onclick="capture()">Scan Face</button>
+
+<h2 id="result"></h2>
+
+<script>
+const video = document.getElementById('video');
+
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => {
+    video.srcObject = stream;
+});
+
+function capture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+
+    canvas.toBlob(blob => {
+        const formData = new FormData();
+        formData.append("file", blob, "capture.jpg");
+
+        fetch("http://127.0.0.1:8000/recognize/", {
+            method: "POST",
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("result").innerText =
+                data.result + " " + (data.confidence ? data.confidence + "%" : "");
+        });
+    });
+}
+</script>
+
+</body>
+</html>
