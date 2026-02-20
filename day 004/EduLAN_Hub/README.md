@@ -31,24 +31,60 @@ EduLAN Hub provides a practical solution by enabling file distribution entirely 
 - ASGI Server: Uvicorn  
 
 ---
-
 ## 📁 Project Structure
 
+The project follows a modular and scalable FastAPI architecture.
+
+```
 edulan-hub/
 │
-├── main.py
-├── database.py
-├── models.py
-├── auth.py
-├── templates/
-│   ├── login.html
-│   └── dashboard.html
-├── static/
-├── uploads/
-├── requirements.txt
-└── README.md
+├── app/                         # Main application package
+│   │
+│   ├── core/                    # Core configuration & security
+│   │   ├── config.py
+│   │   └── security.py
+│   │
+│   ├── database/                # Database configuration & models
+│   │   ├── base.py
+│   │   ├── session.py
+│   │   └── models.py
+│   │
+│   ├── routes/                  # Application routes
+│   │   ├── auth.py
+│   │   ├── dashboard.py
+│   │   └── files.py
+│   │
+│   ├── templates/               # HTML templates (Jinja2)
+│   │   ├── base.html
+│   │   ├── login.html
+│   │   └── dashboard.html
+│   │
+│   ├── static/                  # Static files (CSS, assets)
+│   │   ├── css/
+│   │   │   └── style.css
+│   │   └── assets/
+│   │
+│   └── main.py                  # Application entry point
+│
+├── uploads/                     # Uploaded files storage
+├── tests/                       # Future test cases
+│
+├── .gitignore                   # Ignored files & folders
+├── requirements.txt             # Project dependencies
+├── LICENSE                      # Project license
+└── README.md                    # Project documentation
+```
 
 ---
+
+### 🧠 Architecture Philosophy
+
+- **Separation of Concerns** – Logic, routes, database, and UI are modularized.
+- **Scalable Design** – Easily extendable with services, middleware, and schemas.
+- **Production-Oriented Structure** – Follows modern FastAPI project conventions.
+- **Offline-Optimized Deployment** – Designed for LAN-based school environments.
+- 
+
 
 ## ✨ Features (MVP)
 
