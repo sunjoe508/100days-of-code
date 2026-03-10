@@ -1,56 +1,1185 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>100 Days of Code – Daily Log</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS | Advanced Biometric Recognition System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #00ff88;
+            --dark-bg: #050508;
+            --glass: rgba(10, 15, 30, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: #e0e0e0;
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Animated Background Grid */
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(50px); }
+        }
+
+        /* Scanning Lines */
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            animation: scan 3s linear infinite;
+            opacity: 0.6;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Holographic Card Effect */
+        .holo-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 
+                0 0 20px rgba(0, 243, 255, 0.1),
+                inset 0 0 20px rgba(0, 243, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .holo-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-cyan), transparent, var(--neon-pink), transparent);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .holo-card:hover::before {
+            opacity: 0.5;
+            animation: borderRotate 3s linear infinite;
+        }
+
+        @keyframes borderRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Glowing Text */
+        .glow-text {
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        /* HUD Elements */
+        .hud-corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neon-cyan);
+            transition: all 0.3s;
+        }
+
+        .hud-corner.top-left { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+        .hud-corner.top-right { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+        .hud-corner.bottom-left { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+        .hud-corner.bottom-right { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+
+        /* Face Mesh Overlay */
+        .face-mesh {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .mesh-line {
+            stroke: var(--neon-cyan);
+            stroke-width: 1;
+            fill: none;
+            opacity: 0.6;
+            stroke-dasharray: 5, 5;
+            animation: dash 20s linear infinite;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: 1000; }
+        }
+
+        /* Recognition Points */
+        .rec-point {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+        }
+
+        /* Loading Animation */
+        .cyber-loader {
+            width: 60px;
+            height: 60px;
+            border: 3px solid transparent;
+            border-top-color: var(--neon-cyan);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            position: relative;
+        }
+
+        .cyber-loader::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 3px solid transparent;
+            border-top-color: var(--neon-pink);
+            border-radius: 50%;
+            animation: spin 2s linear infinite reverse;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Data Stream */
+        .data-stream {
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--neon-cyan);
+            opacity: 0.6;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        /* Toggle Switch */
+        .cyber-toggle {
+            appearance: none;
+            width: 60px;
+            height: 30px;
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .cyber-toggle::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: 0.3s;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .cyber-toggle:checked::after {
+            left: 32px;
+            background: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        /* Skeleton Overlay */
+        .skeleton-line {
+            stroke: var(--neon-pink);
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 5px var(--neon-pink));
+        }
+
+        .skeleton-joint {
+            fill: var(--neon-cyan);
+            filter: drop-shadow(0 0 5px var(--neon-cyan));
+        }
+
+        /* Glitch Effect */
+        .glitch {
+            position: relative;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--neon-pink);
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim 3s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 var(--neon-cyan);
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(10px, 9999px, 85px, 0); }
+            20% { clip: rect(63px, 9999px, 130px, 0); }
+            40% { clip: rect(25px, 9999px, 15px, 0); }
+            60% { clip: rect(88px, 9999px, 95px, 0); }
+            80% { clip: rect(42px, 9999px, 68px, 0); }
+            100% { clip: rect(15px, 9999px, 120px, 0); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-cyan);
+            border-radius: 4px;
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .video-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+        }
+
+        /* Recognition Modes */
+        .mode-active {
+            background: rgba(0, 243, 255, 0.2);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+
+        /* Height Measurement Lines */
+        .height-line {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+            opacity: 0.5;
+        }
+
+        .height-marker {
+            position: absolute;
+            right: 10px;
+            color: var(--neon-green);
+            font-size: 10px;
+            transform: translateY(-50%);
+        }
+    </style>
 </head>
-<body>
+<body class="antialiased">
 
-<h2>100 Days of Code – Daily Log</h2>
+    <!-- Background Grid -->
+    <div class="cyber-grid"></div>
 
-<form id="logForm">
-  <input type="text" id="learned" placeholder="What did you learn?" required><br><br>
-  <input type="text" id="built" placeholder="What did you build?" required><br><br>
-  <input type="text" id="reflection" placeholder="Reflection" required><br><br>
-  <button type="submit">Submit Log</button>
-</form>
+    <!-- Header -->
+    <header class="relative z-10 border-b border-cyan-500/30 bg-black/40 backdrop-blur-md">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 border-2 border-cyan-400 rounded-full flex items-center justify-center animate-pulse">
+                    <div class="w-6 h-6 bg-cyan-400 rounded-full opacity-50"></div>
+                </div>
+                <div>
+                    <h1 class="font-orbitron text-2xl font-bold text-white tracking-widest glow-text glitch" data-text="NEXUS">
+                        NEXUS
+                    </h1>
+                    <p class="text-xs text-cyan-400 tracking-[0.3em] uppercase">Biometric Recognition System v4.2</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <div class="text-right hidden md:block">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider">System Status</div>
+                    <div class="text-cyan-400 font-mono text-sm flex items-center gap-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        OPERATIONAL
+                    </div>
+                </div>
+                <div class="text-right hidden md:block">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider">Database</div>
+                    <div class="text-pink-400 font-mono text-sm">847,293 Records</div>
+                </div>
+                <button id="emergencyBtn" class="px-4 py-2 border border-red-500/50 text-red-400 hover:bg-red-500/20 transition-all font-orbitron text-xs tracking-wider uppercase rounded">
+                    Emergency Stop
+                </button>
+            </div>
+        </div>
+    </header>
 
-<p id="status"></p>
+    <!-- Main Interface -->
+    <main class="relative z-10 container mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Panel - Controls -->
+        <aside class="lg:col-span-3 space-y-4">
+            <!-- Recognition Modes -->
+            <div class="holo-card rounded-lg p-6">
+                <div class="hud-corner top-left"></div>
+                <div class="hud-corner top-right"></div>
+                <div class="hud-corner bottom-left"></div>
+                <div class="hud-corner bottom-right"></div>
+                
+                <h3 class="font-orbitron text-cyan-400 text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-cyan-400"></span>
+                    Recognition Modes
+                </h3>
 
-<script>
-const token = "PASTE_YOUR_GITHUB_TOKEN_HERE";
-const owner = "YOUR_GITHUB_USERNAME";
-const repo = "100-days-of-code";
+                <div class="space-y-3">
+                    <label class="flex items-center justify-between p-3 rounded border border-cyan-500/30 cursor-pointer hover:bg-cyan-500/10 transition-all mode-option mode-active" data-mode="face">
+                        <span class="text-sm font-medium">Facial Recognition</span>
+                        <input type="checkbox" class="cyber-toggle" checked>
+                    </label>
+                    
+                    <label class="flex items-center justify-between p-3 rounded border border-cyan-500/30 cursor-pointer hover:bg-cyan-500/10 transition-all mode-option" data-mode="height">
+                        <span class="text-sm font-medium">Height Analysis</span>
+                        <input type="checkbox" class="cyber-toggle">
+                    </label>
+                    
+                    <label class="flex items-center justify-between p-3 rounded border border-cyan-500/30 cursor-pointer hover:bg-cyan-500/10 transition-all mode-option" data-mode="body">
+                        <span class="text-sm font-medium">Body Metrics</span>
+                        <input type="checkbox" class="cyber-toggle">
+                    </label>
+                    
+                    <label class="flex items-center justify-between p-3 rounded border border-cyan-500/30 cursor-pointer hover:bg-cyan-500/10 transition-all mode-option" data-mode="gait">
+                        <span class="text-sm font-medium">Gait Analysis</span>
+                        <input type="checkbox" class="cyber-toggle">
+                    </label>
+                </div>
+            </div>
 
-document.getElementById("logForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
+            <!-- System Controls -->
+            <div class="holo-card rounded-lg p-6">
+                <div class="hud-corner top-left"></div>
+                <div class="hud-corner bottom-right"></div>
+                
+                <h3 class="font-orbitron text-pink-400 text-sm uppercase tracking-wider mb-4">Input Source</h3>
+                
+                <div class="space-y-3">
+                    <button id="cameraBtn" class="w-full py-3 border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/20 transition-all font-orbitron text-xs uppercase tracking-wider rounded flex items-center justify-center gap-2 group">
+                        <svg class="w-4 h-4 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        Activate Camera
+                    </button>
+                    
+                    <button id="uploadBtn" class="w-full py-3 border border-pink-500/50 text-pink-400 hover:bg-pink-500/20 transition-all font-orbitron text-xs uppercase tracking-wider rounded flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Upload Image
+                    </button>
+                    
+                    <input type="file" id="fileInput" class="hidden" accept="image/*">
+                </div>
 
-  const learned = document.getElementById("learned").value;
-  const built = document.getElementById("built").value;
-  const reflection = document.getElementById("reflection").value;
-  const today = new Date().toISOString().split("T")[0];
+                <div class="mt-6 pt-4 border-t border-cyan-500/20">
+                    <div class="flex justify-between text-xs mb-2">
+                        <span class="text-gray-400">Sensitivity</span>
+                        <span class="text-cyan-400 font-mono" id="sensitivityValue">85%</span>
+                    </div>
+                    <input type="range" min="0" max="100" value="85" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-cyan-400" id="sensitivitySlider">
+                </div>
+            </div>
 
-  const response = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/issues`,
-    {
-      method: "POST",
-      headers: {
-        "Authorization": `token ${token}`,
-        "Accept": "application/vnd.github+json"
-      },
-      body: JSON.stringify({
-        title: `Day Log – ${today}`,
-        body: `**Learned:** ${learned}\n\n**Built:** ${built}\n\n**Reflection:** ${reflection}`
-      })
-    }
-  );
+            <!-- Live Metrics -->
+            <div class="holo-card rounded-lg p-4">
+                <h3 class="font-orbitron text-green-400 text-xs uppercase tracking-wider mb-3">Live Processing</h3>
+                <div class="space-y-2 font-mono text-xs">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">FPS:</span>
+                        <span class="text-cyan-400" id="fpsCounter">60</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Latency:</span>
+                        <span class="text-green-400" id="latencyCounter">12ms</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Threads:</span>
+                        <span class="text-pink-400">16 Active</span>
+                    </div>
+                </div>
+                <div class="mt-3 h-16 bg-black/50 rounded border border-cyan-500/20 p-2 overflow-hidden">
+                    <div class="data-stream" id="dataStream">
+                        Initializing neural networks...<br>
+                        Loading biometric templates...<br>
+                        Calibrating sensors...
+                    </div>
+                </div>
+            </div>
+        </aside>
 
-  if (response.ok) {
-    document.getElementById("status").innerText = "✅ Log saved to GitHub!";
-  } else {
-    document.getElementById("status").innerText = "❌ Error saving log.";
-  }
-});
-</script>
+        <!-- Center - Main Display -->
+        <section class="lg:col-span-6">
+            <div class="holo-card rounded-lg p-1 h-full min-h-[500px] relative">
+                <div class="hud-corner top-left"></div>
+                <div class="hud-corner top-right"></div>
+                <div class="hud-corner bottom-left"></div>
+                <div class="hud-corner bottom-right"></div>
+                
+                <!-- Video/Canvas Container -->
+                <div class="video-container w-full h-full rounded bg-black relative overflow-hidden" id="mainDisplay">
+                    <video id="videoElement" class="w-full h-full object-cover hidden" autoplay playsinline></video>
+                    <canvas id="mainCanvas" class="w-full h-full object-cover"></canvas>
+                    
+                    <!-- Default State -->
+                    <div id="defaultState" class="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
+                        <div class="cyber-loader mb-6"></div>
+                        <h2 class="font-orbitron text-2xl text-cyan-400 mb-2 tracking-widest">STANDBY MODE</h2>
+                        <p class="text-gray-500 text-sm max-w-md">Select input source to begin multi-modal biometric analysis. System ready for facial, anthropometric, and kinematic identification.</p>
+                    </div>
 
+                    <!-- Scanning Overlay -->
+                    <div id="scanningOverlay" class="absolute inset-0 pointer-events-none hidden">
+                        <div class="scan-line"></div>
+                        <div class="absolute top-4 left-4 flex items-center gap-2">
+                            <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                            <span class="text-red-500 font-orbitron text-xs tracking-wider">SCANNING</span>
+                        </div>
+                        <div class="absolute top-4 right-4 text-right">
+                            <div class="text-cyan-400 font-mono text-xs" id="scanProgress">0%</div>
+                        </div>
+                    </div>
+
+                    <!-- Face Mesh SVG Overlay -->
+                    <svg id="faceMesh" class="face-mesh hidden" viewBox="0 0 640 480">
+                        <!-- Dynamic mesh lines will be added here -->
+                    </svg>
+
+                    <!-- Skeleton SVG Overlay -->
+                    <svg id="skeletonOverlay" class="face-mesh hidden" viewBox="0 0 640 480">
+                        <!-- Dynamic skeleton will be added here -->
+                    </svg>
+
+                    <!-- Height Measurement Lines -->
+                    <div id="heightLines" class="absolute inset-0 pointer-events-none hidden">
+                        <!-- Dynamic height markers -->
+                    </div>
+
+                    <!-- Recognition Points Container -->
+                    <div id="recPoints" class="absolute inset-0 pointer-events-none"></div>
+                </div>
+
+                <!-- Bottom HUD -->
+                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 pointer-events-none">
+                    <div class="flex justify-between items-end">
+                        <div class="flex gap-4">
+                            <div class="text-center">
+                                <div class="text-xs text-gray-500 uppercase">Confidence</div>
+                                <div class="font-orbitron text-xl text-cyan-400" id="confidenceScore">--</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xs text-gray-500 uppercase">Match</div>
+                                <div class="font-orbitron text-xl text-green-400" id="matchScore">--</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-gray-500 uppercase">Target ID</div>
+                            <div class="font-mono text-lg text-pink-400 tracking-wider" id="targetId">UNKNOWN</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Panel - Analysis Results -->
+        <aside class="lg:col-span-3 space-y-4">
+            <!-- Face Analysis -->
+            <div class="holo-card rounded-lg p-4 hidden" id="facePanel">
+                <div class="hud-corner top-right"></div>
+                <h3 class="font-orbitron text-cyan-400 text-xs uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Facial Analysis
+                </h3>
+                <div class="space-y-2 text-xs">
+                    <div class="flex justify-between border-b border-cyan-500/20 pb-1">
+                        <span class="text-gray-400">Age Estimate:</span>
+                        <span class="text-white font-mono" id="faceAge">--</span>
+                    </div>
+                    <div class="flex justify-between border-b border-cyan-500/20 pb-1">
+                        <span class="text-gray-400">Gender:</span>
+                        <span class="text-white font-mono" id="faceGender">--</span>
+                    </div>
+                    <div class="flex justify-between border-b border-cyan-500/20 pb-1">
+                        <span class="text-gray-400">Emotion:</span>
+                        <span class="text-white font-mono" id="faceEmotion">--</span>
+                    </div>
+                    <div class="flex justify-between border-b border-cyan-500/20 pb-1">
+                        <span class="text-gray-400">Face ID:</span>
+                        <span class="text-cyan-400 font-mono" id="faceId">--</span>
+                    </div>
+                </div>
+                <div class="mt-3 grid grid-cols-3 gap-1">
+                    <div class="bg-black/50 p-2 rounded text-center">
+                        <div class="text-[10px] text-gray-500">Eyes</div>
+                        <div class="text-green-400 text-xs">●</div>
+                    </div>
+                    <div class="bg-black/50 p-2 rounded text-center">
+                        <div class="text-[10px] text-gray-500">Nose</div>
+                        <div class="text-green-400 text-xs">●</div>
+                    </div>
+                    <div class="bg-black/50 p-2 rounded text-center">
+                        <div class="text-[10px] text-gray-500">Mouth</div>
+                        <div class="text-green-400 text-xs">●</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body Metrics -->
+            <div class="holo-card rounded-lg p-4 hidden" id="bodyPanel">
+                <div class="hud-corner bottom-left"></div>
+                <h3 class="font-orbitron text-pink-400 text-xs uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    Anthropometrics
+                </h3>
+                <div class="space-y-2 text-xs">
+                    <div class="flex justify-between border-b border-pink-500/20 pb-1">
+                        <span class="text-gray-400">Height:</span>
+                        <span class="text-white font-mono" id="bodyHeight">--</span>
+                    </div>
+                    <div class="flex justify-between border-b border-pink-500/20 pb-1">
+                        <span class="text-gray-400">Shoulder Width:</span>
+                        <span class="text-white font-mono" id="bodyShoulders">--</span>
+                    </div>
+                    <div class="flex justify-between border-b border-pink-500/20 pb-1">
+                        <span class="text-gray-400">Posture:</span>
+                        <span class="text-white font-mono" id="bodyPosture">--</span>
+                    </div>
+                    <div class="flex justify-between border-b border-pink-500/20 pb-1">
+                        <span class="text-gray-400">Build:</span>
+                        <span class="text-white font-mono" id="bodyBuild">--</span>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="text-[10px] text-gray-500 mb-1">Body Ratio</div>
+                    <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-pink-500 to-purple-500 w-3/4 animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gait Analysis -->
+            <div class="holo-card rounded-lg p-4 hidden" id="gaitPanel">
+                <h3 class="font-orbitron text-green-400 text-xs uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    Gait Signature
+                </h3>
+                <div class="space-y-2 text-xs">
+                    <div class="flex justify-between border-b border-green-500/20 pb-1">
+                        <span class="text-gray-400">Stride Length:</span>
+                        <span class="text-white font-mono" id="gaitStride">--</span>
+                    </div>
+                    <div class="flex justify-between border-b border-green-500/20 pb-1">
+                        <span class="text-gray-400">Cadence:</span>
+                        <span class="text-white font-mono" id="gaitCadence">--</span>
+                    </div>
+                    <div class="flex justify-between border-b border-green-500/20 pb-1">
+                        <span class="text-gray-400">Swing Phase:</span>
+                        <span class="text-white font-mono" id="gaitSwing">--</span>
+                    </div>
+                    <div class="flex justify-between border-b border-green-500/20 pb-1">
+                        <span class="text-gray-400">Pattern ID:</span>
+                        <span class="text-green-400 font-mono" id="gaitId">--</span>
+                    </div>
+                </div>
+                <div class="mt-3 h-16 bg-black/50 rounded border border-green-500/20 relative overflow-hidden">
+                    <canvas id="gaitGraph" class="w-full h-full"></canvas>
+                </div>
+            </div>
+
+            <!-- Threat Assessment -->
+            <div class="holo-card rounded-lg p-4 border-red-500/30">
+                <h3 class="font-orbitron text-red-400 text-xs uppercase tracking-wider mb-3">Threat Level</h3>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs text-gray-400">Assessment:</span>
+                    <span class="text-green-400 font-bold text-sm" id="threatLevel">LOW</span>
+                </div>
+                <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                    <div id="threatBar" class="h-full bg-green-500 w-[15%] transition-all duration-500"></div>
+                </div>
+                <div class="mt-3 text-[10px] text-gray-500 font-mono">
+                    > No anomalies detected<br>
+                    > Biometric match: NEGATIVE<br>
+                    > Behavioral analysis: NORMAL
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-2 gap-2">
+                <button id="captureBtn" class="py-3 bg-cyan-500/20 border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/30 transition-all font-orbitron text-xs uppercase rounded disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    Capture
+                </button>
+                <button id="analyzeBtn" class="py-3 bg-pink-500/20 border border-pink-500/50 text-pink-400 hover:bg-pink-500/30 transition-all font-orbitron text-xs uppercase rounded disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    Analyze
+                </button>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Results Modal -->
+    <div id="resultsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="holo-card rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 relative">
+            <div class="hud-corner top-left"></div>
+            <div class="hud-corner bottom-right"></div>
+            
+            <button id="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+
+            <h2 class="font-orbitron text-2xl text-cyan-400 mb-6 text-center">IDENTIFICATION COMPLETE</h2>
+            
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-black/50 p-4 rounded border border-cyan-500/30 text-center">
+                    <div class="text-gray-400 text-xs uppercase mb-1">Match Confidence</div>
+                    <div class="text-3xl font-orbitron text-green-400" id="modalConfidence">98.4%</div>
+                </div>
+                <div class="bg-black/50 p-4 rounded border border-pink-500/30 text-center">
+                    <div class="text-gray-400 text-xs uppercase mb-1">Subject ID</div>
+                    <div class="text-3xl font-orbitron text-pink-400" id="modalId">SUB-7842</div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="border-l-2 border-cyan-500 pl-4">
+                    <h4 class="text-cyan-400 font-orbitron text-sm mb-2">FACIAL BIOMETRICS</h4>
+                    <p class="text-gray-300 text-sm">128-point facial landmark map generated. Distance between eyes: 6.4cm. Nose bridge ratio: 0.34. Jawline symmetry: 94%.</p>
+                </div>
+                <div class="border-l-2 border-pink-500 pl-4">
+                    <h4 class="text-pink-400 font-orbitron text-sm mb-2">ANTHROPOMETRIC DATA</h4>
+                    <p class="text-gray-300 text-sm">Estimated height: 178cm. Shoulder width: 46cm. Detected posture: Slight forward neck tilt (3°). Arm span ratio: 1.02.</p>
+                </div>
+                <div class="border-l-2 border-green-500 pl-4">
+                    <h4 class="text-green-400 font-orbitron text-sm mb-2">KINEMATIC SIGNATURE</h4>
+                    <p class="text-gray-300 text-sm">Gait velocity: 1.4m/s. Step length: 72cm. Double support time: 22%. Identified walking pattern: Class B-7 (Balanced/Neutral).</p>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-gray-700 flex justify-between items-center">
+                <span class="text-xs text-gray-500">Timestamp: <span id="modalTime"></span></span>
+                <button class="px-4 py-2 bg-cyan-500/20 border border-cyan-500 text-cyan-400 rounded hover:bg-cyan-500/30 transition-all text-xs uppercase tracking-wider">
+                    Export Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System State
+        const state = {
+            cameraActive: false,
+            stream: null,
+            modes: {
+                face: true,
+                height: false,
+                body: false,
+                gait: false
+            },
+            analyzing: false,
+            sensitivity: 85
+        };
+
+        // DOM Elements
+        const video = document.getElementById('videoElement');
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        const defaultState = document.getElementById('defaultState');
+        const scanningOverlay = document.getElementById('scanningOverlay');
+        const faceMesh = document.getElementById('faceMesh');
+        const skeletonOverlay = document.getElementById('skeletonOverlay');
+        const heightLines = document.getElementById('heightLines');
+        const recPoints = document.getElementById('recPoints');
+
+        // Mode Toggles
+        document.querySelectorAll('.mode-option').forEach(option => {
+            option.addEventListener('click', function(e) {
+                if (e.target.type !== 'checkbox') {
+                    const checkbox = this.querySelector('input[type="checkbox"]');
+                    checkbox.checked = !checkbox.checked;
+                }
+                const mode = this.dataset.mode;
+                state.modes[mode] = this.querySelector('input').checked;
+                this.classList.toggle('mode-active', state.modes[mode]);
+                updateOverlays();
+            });
+        });
+
+        // Sensitivity Slider
+        document.getElementById('sensitivitySlider').addEventListener('input', (e) => {
+            state.sensitivity = e.target.value;
+            document.getElementById('sensitivityValue').textContent = state.sensitivity + '%';
+        });
+
+        // Camera Activation
+        document.getElementById('cameraBtn').addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'environment'
+                    } 
+                });
+                state.stream = stream;
+                video.srcObject = stream;
+                video.classList.remove('hidden');
+                defaultState.classList.add('hidden');
+                state.cameraActive = true;
+                
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    startProcessing();
+                };
+                
+                document.getElementById('captureBtn').disabled = false;
+                document.getElementById('analyzeBtn').disabled = false;
+                
+                logData('Camera activated. Video stream established.');
+            } catch (err) {
+                alert('Camera access denied or not available. Please use image upload instead.');
+                logData('ERROR: Camera access failed - ' + err.message);
+            }
+        });
+
+        // File Upload
+        document.getElementById('uploadBtn').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const img = new Image();
+                img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    defaultState.classList.add('hidden');
+                    video.classList.add('hidden');
+                    state.cameraActive = false;
+                    document.getElementById('captureBtn').disabled = false;
+                    document.getElementById('analyzeBtn').disabled = false;
+                    simulateDetection();
+                };
+                img.src = URL.createObjectURL(file);
+                logData('Image uploaded: ' + file.name);
+            }
+        });
+
+        // Processing Loop
+        function startProcessing() {
+            function process() {
+                if (state.cameraActive && video.readyState === 4) {
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    // Apply scan lines effect
+                    if (state.analyzing) {
+                        applyScanEffect();
+                    }
+                    
+                    // Update FPS
+                    updateFPS();
+                }
+                requestAnimationFrame(process);
+            }
+            process();
+        }
+
+        function applyScanEffect() {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            // Add subtle noise
+            for (let i = 0; i < data.length; i += 4) {
+                const noise = (Math.random() - 0.5) * 20;
+                data[i] = Math.min(255, Math.max(0, data[i] + noise));
+                data[i+1] = Math.min(255, Math.max(0, data[i+1] + noise));
+                data[i+2] = Math.min(255, Math.max(0, data[i+2] + noise));
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        // Simulate Detection Visualization
+        function simulateDetection() {
+            // Clear previous
+            recPoints.innerHTML = '';
+            faceMesh.innerHTML = '';
+            skeletonOverlay.innerHTML = '';
+            heightLines.innerHTML = '';
+
+            // Show relevant panels
+            if (state.modes.face) {
+                document.getElementById('facePanel').classList.remove('hidden');
+                drawFaceMesh();
+                generateFaceData();
+            }
+            if (state.modes.height || state.modes.body) {
+                document.getElementById('bodyPanel').classList.remove('hidden');
+                drawHeightLines();
+                generateBodyData();
+            }
+            if (state.modes.gait) {
+                document.getElementById('gaitPanel').classList.remove('hidden');
+                drawSkeleton();
+                generateGaitData();
+            }
+
+            // Random recognition points
+            for (let i = 0; i < 8; i++) {
+                const point = document.createElement('div');
+                point.className = 'rec-point';
+                point.style.left = Math.random() * 80 + 10 + '%';
+                point.style.top = Math.random() * 80 + 10 + '%';
+                point.style.animationDelay = Math.random() * 2 + 's';
+                recPoints.appendChild(point);
+            }
+
+            // Update scores
+            const confidence = (85 + Math.random() * 14).toFixed(1);
+            const match = (state.sensitivity - 5 + Math.random() * 10).toFixed(1);
+            document.getElementById('confidenceScore').textContent = confidence + '%';
+            document.getElementById('matchScore').textContent = match + '%';
+            document.getElementById('targetId').textContent = 'SUB-' + Math.floor(1000 + Math.random() * 8999);
+        }
+
+        function drawFaceMesh() {
+            faceMesh.classList.remove('hidden');
+            const points = [];
+            // Generate facial landmark points
+            for (let i = 0; i < 468; i++) {
+                const x = 320 + (Math.random() - 0.5) * 200;
+                const y = 240 + (Math.random() - 0.5) * 250;
+                points.push(`${x},${y}`);
+            }
+            
+            // Create mesh lines
+            let pathData = '';
+            for (let i = 0; i < points.length - 1; i++) {
+                if (i % 10 === 0) {
+                    pathData += `M${points[i]} L${points[i+1]} `;
+                }
+            }
+            
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', pathData);
+            path.setAttribute('class', 'mesh-line');
+            faceMesh.appendChild(path);
+        }
+
+        function drawSkeleton() {
+            skeletonOverlay.classList.remove('hidden');
+            
+            // Simplified skeleton structure
+            const joints = [
+                [320, 100], // Head
+                [320, 200], // Neck
+                [250, 220], // Left Shoulder
+                [390, 220], // Right Shoulder
+                [220, 350], // Left Hand
+                [420, 350], // Right Hand
+                [320, 350], // Hip Center
+                [280, 480], // Left Foot
+                [360, 480]  // Right Foot
+            ];
+            
+            // Draw lines between joints
+            const connections = [[0,1], [1,2], [1,3], [2,4], [3,5], [1,6], [6,7], [6,8]];
+            
+            connections.forEach(([start, end]) => {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', joints[start][0]);
+                line.setAttribute('y1', joints[start][1]);
+                line.setAttribute('x2', joints[end][0]);
+                line.setAttribute('y2', joints[end][1]);
+                line.setAttribute('class', 'skeleton-line');
+                skeletonOverlay.appendChild(line);
+            });
+            
+            // Draw joints
+            joints.forEach(joint => {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', joint[0]);
+                circle.setAttribute('cy', joint[1]);
+                circle.setAttribute('r', '4');
+                circle.setAttribute('class', 'skeleton-joint');
+                skeletonOverlay.appendChild(circle);
+            });
+        }
+
+        function drawHeightLines() {
+            heightLines.classList.remove('hidden');
+            const heights = [50, 150, 250, 350, 450];
+            heights.forEach((h, i) => {
+                const line = document.createElement('div');
+                line.className = 'height-line';
+                line.style.top = h + 'px';
+                
+                const marker = document.createElement('div');
+                marker.className = 'height-marker';
+                marker.textContent = (180 - i * 30) + 'cm';
+                line.appendChild(marker);
+                
+                heightLines.appendChild(line);
+            });
+        }
+
+        function generateFaceData() {
+            const ages = [24, 31, 28, 35, 42, 19];
+            const genders = ['Male', 'Female', 'Male', 'Female'];
+            const emotions = ['Neutral', 'Focused', 'Calm', 'Alert'];
+            
+            document.getElementById('faceAge').textContent = ages[Math.floor(Math.random() * ages.length)] + ' yrs';
+            document.getElementById('faceGender').textContent = genders[Math.floor(Math.random() * genders.length)];
+            document.getElementById('faceEmotion').textContent = emotions[Math.floor(Math.random() * emotions.length)];
+            document.getElementById('faceId').textContent = 'FACE-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        }
+
+        function generateBodyData() {
+            document.getElementById('bodyHeight').textContent = (165 + Math.random() * 25).toFixed(1) + ' cm';
+            document.getElementById('bodyShoulders').textContent = (40 + Math.random() * 15).toFixed(1) + ' cm';
+            document.getElementById('bodyPosture').textContent = ['Upright', 'Slight Lean', 'Neutral'][Math.floor(Math.random() * 3)];
+            document.getElementById('bodyBuild').textContent = ['Athletic', 'Average', 'Slim', 'Heavy'][Math.floor(Math.random() * 4)];
+        }
+
+        function generateGaitData() {
+            document.getElementById('gaitStride').textContent = (60 + Math.random() * 30).toFixed(1) + ' cm';
+            document.getElementById('gaitCadence').textContent = (90 + Math.random() * 40).toFixed(0) + ' spm';
+            document.getElementById('gaitSwing').textContent = (35 + Math.random() * 10).toFixed(1) + '%';
+            document.getElementById('gaitId').textContent = 'GAIT-' + Math.floor(100 + Math.random() * 899);
+            
+            // Draw simple gait graph
+            const gaitCanvas = document.getElementById('gaitGraph');
+            const gCtx = gaitCanvas.getContext('2d');
+            gaitCanvas.width = gaitCanvas.offsetWidth;
+            gaitCanvas.height = gaitCanvas.offsetHeight;
+            
+            gCtx.strokeStyle = '#00ff88';
+            gCtx.lineWidth = 2;
+            gCtx.beginPath();
+            gCtx.moveTo(0, gaitCanvas.height / 2);
+            
+            for (let x = 0; x < gaitCanvas.width; x += 5) {
+                const y = gaitCanvas.height / 2 + Math.sin(x * 0.05) * 20 + (Math.random() - 0.5) * 10;
+                gCtx.lineTo(x, y);
+            }
+            gCtx.stroke();
+        }
+
+        function updateOverlays() {
+            if (!state.cameraActive && canvas.width === 0) return;
+            
+            recPoints.innerHTML = '';
+            faceMesh.classList.add('hidden');
+            skeletonOverlay.classList.add('hidden');
+            heightLines.classList.add('hidden');
+            document.getElementById('facePanel').classList.add('hidden');
+            document.getElementById('bodyPanel').classList.add('hidden');
+            document.getElementById('gaitPanel').classList.add('hidden');
+            
+            simulateDetection();
+        }
+
+        // Analysis Button
+        document.getElementById('analyzeBtn').addEventListener('click', () => {
+            state.analyzing = true;
+            scanningOverlay.classList.remove('hidden');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        state.analyzing = false;
+                        scanningOverlay.classList.add('hidden');
+                        showResults();
+                    }, 500);
+                }
+                document.getElementById('scanProgress').textContent = Math.floor(progress) + '%';
+            }, 200);
+            
+            logData('Initiating deep biometric analysis...');
+        });
+
+        // Capture Button
+        document.getElementById('captureBtn').addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'nexus-capture-' + Date.now() + '.png';
+            link.href = canvas.toDataURL();
+            link.click();
+            logData('Image captured and saved to local storage');
+        });
+
+        // Results Modal
+        function showResults() {
+            document.getElementById('resultsModal').classList.remove('hidden');
+            document.getElementById('resultsModal').classList.add('flex');
+            document.getElementById('modalTime').textContent = new Date().toLocaleString();
+            
+            // Randomize modal data slightly
+            document.getElementById('modalConfidence').textContent = (90 + Math.random() * 9).toFixed(1) + '%';
+            document.getElementById('modalId').textContent = 'SUB-' + Math.floor(1000 + Math.random() * 8999);
+        }
+
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('resultsModal').classList.add('hidden');
+            document.getElementById('resultsModal').classList.remove('flex');
+        });
+
+        // Emergency Stop
+        document.getElementById('emergencyBtn').addEventListener('click', () => {
+            if (state.stream) {
+                state.stream.getTracks().forEach(track => track.stop());
+            }
+            state.cameraActive = false;
+            state.analyzing = false;
+            video.classList.add('hidden');
+            defaultState.classList.remove('hidden');
+            scanningOverlay.classList.add('hidden');
+            document.getElementById('captureBtn').disabled = true;
+            document.getElementById('analyzeBtn').disabled = true;
+            logData('EMERGENCY STOP ACTIVATED - All systems halted');
+        });
+
+        // Data Stream Logger
+        function logData(message) {
+            const stream = document.getElementById('dataStream');
+            const line = document.createElement('div');
+            line.textContent = '> ' + message;
+            stream.appendChild(line);
+            stream.scrollTop = stream.scrollHeight;
+            
+            // Keep only last 5 lines
+            while (stream.children.length > 5) {
+                stream.removeChild(stream.firstChild);
+            }
+        }
+
+        // FPS Counter
+        let lastTime = performance.now();
+        let frames = 0;
+        function updateFPS() {
+            frames++;
+            const currentTime = performance.now();
+            if (currentTime - lastTime >= 1000) {
+                document.getElementById('fpsCounter').textContent = frames;
+                document.getElementById('latencyCounter').textContent = Math.floor(Math.random() * 20 + 5) + 'ms';
+                frames = 0;
+                lastTime = currentTime;
+            }
+        }
+
+        // Random data stream updates
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                const messages = [
+                    'Optimizing neural pathways...',
+                    'Scanning biometric database...',
+                    'Calibrating depth sensors...',
+                    'Updating kinematic model...',
+                    'Syncing with cloud AI...',
+                    'Analyzing micro-expressions...'
+                ];
+                logData(messages[Math.floor(Math.random() * messages.length)]);
+            }
+        }, 3000);
+
+        // Initialize
+        logData('System initialized. Waiting for input...');
+    </script>
 </body>
 </html>
