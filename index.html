@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS | Advanced Biometric Recognition System</title>
+    <title>NEXUS PRO | Advanced Biometric Surveillance System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.10.0/tf.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-cyan: #00f3ff;
             --neon-pink: #ff00ff;
             --neon-green: #00ff88;
-            --dark-bg: #050508;
-            --glass: rgba(10, 15, 30, 0.7);
+            --neon-amber: #ffaa00;
+            --dark-bg: #020204;
+            --panel-bg: rgba(10, 15, 30, 0.85);
         }
 
         * {
@@ -29,11 +31,10 @@
             min-height: 100vh;
         }
 
-        .font-orbitron {
-            font-family: 'Orbitron', sans-serif;
-        }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .font-mono-tech { font-family: 'Share Tech Mono', monospace; }
 
-        /* Animated Background Grid */
+        /* Animated Background */
         .cyber-grid {
             position: fixed;
             top: 0;
@@ -43,28 +44,213 @@
             background-image: 
                 linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+            background-size: 40px 40px;
             perspective: 1000px;
-            transform-style: preserve-3d;
-            animation: gridMove 20s linear infinite;
+            animation: gridMove 15s linear infinite;
             pointer-events: none;
             z-index: 0;
         }
 
         @keyframes gridMove {
             0% { transform: translateY(0); }
-            100% { transform: translateY(50px); }
+            100% { transform: translateY(40px); }
         }
 
-        /* Scanning Lines */
-        .scan-line {
+        /* Holographic UI Elements */
+        .holo-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 
+                0 0 30px rgba(0, 243, 255, 0.05),
+                inset 0 0 30px rgba(0, 243, 255, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .holo-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            animation: scanline 3s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Corner Accents */
+        .corner-accent {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neon-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .corner-tl { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+        .corner-tr { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+        .corner-bl { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+        .corner-br { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+
+        .holo-panel:hover .corner-accent {
+            width: 30px;
+            height: 30px;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        /* Glowing Elements */
+        .glow-text {
+            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+        }
+
+        .glow-border {
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+
+        /* Cyber Buttons */
+        .cyber-btn {
+            position: relative;
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .cyber-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cyber-btn:hover::before {
+            left: 100%;
+        }
+
+        .cyber-btn:hover {
+            background: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .cyber-btn.active {
+            background: rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.5);
+        }
+
+        .cyber-btn.danger {
+            border-color: rgba(255, 0, 85, 0.4);
+            color: #ff0055;
+        }
+
+        .cyber-btn.danger:hover {
+            background: rgba(255, 0, 85, 0.2);
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+        }
+
+        /* Form Elements */
+        .cyber-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            color: var(--neon-cyan);
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 0.3s;
+        }
+
+        .cyber-input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        .cyber-input::placeholder {
+            color: rgba(0, 243, 255, 0.4);
+        }
+
+        /* Toggle Switch */
+        .cyber-toggle {
+            appearance: none;
+            width: 50px;
+            height: 26px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cyber-toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #555;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .cyber-toggle:checked {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: var(--neon-cyan);
+        }
+
+        .cyber-toggle:checked::after {
+            left: 26px;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        /* Video Container */
+        .video-feed {
+            position: relative;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .video-feed::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+        }
+
+        /* Scanning Animation */
+        .scanner-line {
             position: absolute;
             width: 100%;
             height: 2px;
             background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-            animation: scan 3s linear infinite;
-            opacity: 0.6;
-            box-shadow: 0 0 10px var(--neon-cyan);
+            box-shadow: 0 0 20px var(--neon-cyan);
+            animation: scan 2s linear infinite;
+            z-index: 10;
         }
 
         @keyframes scan {
@@ -74,445 +260,277 @@
             100% { top: 100%; opacity: 0; }
         }
 
-        /* Holographic Card Effect */
-        .holo-card {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            box-shadow: 
-                0 0 20px rgba(0, 243, 255, 0.1),
-                inset 0 0 20px rgba(0, 243, 255, 0.05);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .holo-card::before {
-            content: '';
+        /* Detection Overlay */
+        .detection-box {
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, var(--neon-cyan), transparent, var(--neon-pink), transparent);
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .holo-card:hover::before {
-            opacity: 0.5;
-            animation: borderRotate 3s linear infinite;
-        }
-
-        @keyframes borderRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Glowing Text */
-        .glow-text {
-            text-shadow: 0 0 10px currentColor;
-        }
-
-        /* HUD Elements */
-        .hud-corner {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--neon-cyan);
+            border: 2px solid var(--neon-green);
+            background: rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
             transition: all 0.3s;
         }
 
-        .hud-corner.top-left { top: 0; left: 0; border-right: 0; border-bottom: 0; }
-        .hud-corner.top-right { top: 0; right: 0; border-left: 0; border-bottom: 0; }
-        .hud-corner.bottom-left { bottom: 0; left: 0; border-right: 0; border-top: 0; }
-        .hud-corner.bottom-right { bottom: 0; right: 0; border-left: 0; border-top: 0; }
-
-        /* Face Mesh Overlay */
-        .face-mesh {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-
-        .mesh-line {
-            stroke: var(--neon-cyan);
-            stroke-width: 1;
-            fill: none;
-            opacity: 0.6;
-            stroke-dasharray: 5, 5;
-            animation: dash 20s linear infinite;
-        }
-
-        @keyframes dash {
-            to { stroke-dashoffset: 1000; }
-        }
-
-        /* Recognition Points */
-        .rec-point {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: var(--neon-green);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--neon-green);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-        }
-
-        /* Loading Animation */
-        .cyber-loader {
-            width: 60px;
-            height: 60px;
-            border: 3px solid transparent;
-            border-top-color: var(--neon-cyan);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            position: relative;
-        }
-
-        .cyber-loader::before {
+        .detection-box::before,
+        .detection-box::after {
             content: '';
             position: absolute;
-            top: 5px;
-            left: 5px;
-            right: 5px;
-            bottom: 5px;
+            width: 10px;
+            height: 10px;
+            border: 2px solid var(--neon-green);
+        }
+
+        .detection-box::before {
+            top: -2px;
+            left: -2px;
+            border-right: 0;
+            border-bottom: 0;
+        }
+
+        .detection-box::after {
+            bottom: -2px;
+            right: -2px;
+            border-left: 0;
+            border-top: 0;
+        }
+
+        .detection-label {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: var(--neon-green);
+            color: #000;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            white-space: nowrap;
+        }
+
+        /* Age Stabilizer Indicator */
+        .stability-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .stability-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+            transition: width 0.5s ease;
+        }
+
+        /* Database Panel */
+        .db-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .db-item:hover {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: var(--neon-cyan);
+            transform: translateX(5px);
+        }
+
+        .db-item.selected {
+            background: rgba(0, 243, 255, 0.2);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-cyan);
+            border-radius: 3px;
+        }
+
+        /* Modal */
+        .cyber-modal {
+            background: rgba(5, 5, 8, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
+        }
+
+        /* Loading Spinner */
+        .cyber-spinner {
+            width: 50px;
+            height: 50px;
             border: 3px solid transparent;
-            border-top-color: var(--neon-pink);
+            border-top-color: var(--neon-cyan);
+            border-right-color: var(--neon-pink);
             border-radius: 50%;
-            animation: spin 2s linear infinite reverse;
+            animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        /* Data Stream */
-        .data-stream {
-            font-family: monospace;
-            font-size: 12px;
-            color: var(--neon-cyan);
-            opacity: 0.6;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-
-        /* Toggle Switch */
-        .cyber-toggle {
-            appearance: none;
-            width: 60px;
-            height: 30px;
-            background: rgba(0, 243, 255, 0.1);
-            border: 1px solid var(--neon-cyan);
-            border-radius: 15px;
-            position: relative;
-            cursor: pointer;
-            outline: none;
-        }
-
-        .cyber-toggle::after {
-            content: '';
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            background: var(--neon-cyan);
+        /* Status Indicators */
+        .status-dot {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: 0.3s;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .status-online { background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+        .status-offline { background: #ff0055; box-shadow: 0 0 10px #ff0055; }
+        .status-warning { background: var(--neon-amber); box-shadow: 0 0 10px var(--neon-amber); }
+
+        /* Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: var(--neon-cyan);
+            cursor: pointer;
+            margin-top: -6px;
             box-shadow: 0 0 10px var(--neon-cyan);
         }
 
-        .cyber-toggle:checked::after {
-            left: 32px;
-            background: var(--neon-green);
-            box-shadow: 0 0 10px var(--neon-green);
-        }
-
-        /* Skeleton Overlay */
-        .skeleton-line {
-            stroke: var(--neon-pink);
-            stroke-width: 3;
-            fill: none;
-            stroke-linecap: round;
-            filter: drop-shadow(0 0 5px var(--neon-pink));
-        }
-
-        .skeleton-joint {
-            fill: var(--neon-cyan);
-            filter: drop-shadow(0 0 5px var(--neon-cyan));
-        }
-
-        /* Glitch Effect */
-        .glitch {
-            position: relative;
-        }
-
-        .glitch::before,
-        .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
+        input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
-            height: 100%;
-        }
-
-        .glitch::before {
-            left: 2px;
-            text-shadow: -2px 0 var(--neon-pink);
-            clip: rect(24px, 550px, 90px, 0);
-            animation: glitch-anim 3s infinite linear alternate-reverse;
-        }
-
-        .glitch::after {
-            left: -2px;
-            text-shadow: -2px 0 var(--neon-cyan);
-            clip: rect(85px, 550px, 140px, 0);
-            animation: glitch-anim 2s infinite linear alternate-reverse;
-        }
-
-        @keyframes glitch-anim {
-            0% { clip: rect(10px, 9999px, 85px, 0); }
-            20% { clip: rect(63px, 9999px, 130px, 0); }
-            40% { clip: rect(25px, 9999px, 15px, 0); }
-            60% { clip: rect(88px, 9999px, 95px, 0); }
-            80% { clip: rect(42px, 9999px, 68px, 0); }
-            100% { clip: rect(15px, 9999px, 120px, 0); }
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--dark-bg);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--neon-cyan);
-            border-radius: 4px;
-        }
-
-        /* Video Container */
-        .video-container {
-            position: relative;
-            background: #000;
-            overflow: hidden;
-        }
-
-        .video-container::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0, 0, 0, 0.15),
-                rgba(0, 0, 0, 0.15) 1px,
-                transparent 1px,
-                transparent 2px
-            );
-            pointer-events: none;
-        }
-
-        /* Recognition Modes */
-        .mode-active {
+            height: 4px;
+            cursor: pointer;
             background: rgba(0, 243, 255, 0.2);
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
-        }
-
-        /* Height Measurement Lines */
-        .height-line {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
-            opacity: 0.5;
-        }
-
-        .height-marker {
-            position: absolute;
-            right: 10px;
-            color: var(--neon-green);
-            font-size: 10px;
-            transform: translateY(-50%);
+            border-radius: 2px;
         }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- Background Grid -->
     <div class="cyber-grid"></div>
 
     <!-- Header -->
-    <header class="relative z-10 border-b border-cyan-500/30 bg-black/40 backdrop-blur-md">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+    <header class="relative z-20 border-b border-cyan-500/30 bg-black/60 backdrop-blur-lg">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <div class="w-10 h-10 border-2 border-cyan-400 rounded-full flex items-center justify-center animate-pulse">
-                    <div class="w-6 h-6 bg-cyan-400 rounded-full opacity-50"></div>
+                <div class="w-12 h-12 border-2 border-cyan-400 rounded-lg flex items-center justify-center relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-cyan-400/20 translate-y-full group-hover:translate-y-0 transition-transform"></div>
+                    <svg class="w-6 h-6 text-cyan-400 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+                    </svg>
                 </div>
                 <div>
-                    <h1 class="font-orbitron text-2xl font-bold text-white tracking-widest glow-text glitch" data-text="NEXUS">
-                        NEXUS
-                    </h1>
-                    <p class="text-xs text-cyan-400 tracking-[0.3em] uppercase">Biometric Recognition System v4.2</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-6">
-                <div class="text-right hidden md:block">
-                    <div class="text-xs text-gray-400 uppercase tracking-wider">System Status</div>
-                    <div class="text-cyan-400 font-mono text-sm flex items-center gap-2">
-                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                        OPERATIONAL
+                    <h1 class="font-orbitron text-2xl font-bold text-white tracking-widest glow-text">NEXUS<span class="text-cyan-400">PRO</span></h1>
+                    <div class="flex items-center gap-3 text-xs">
+                        <span class="text-gray-400 tracking-wider">BIOMETRIC SURVEILLANCE SYSTEM</span>
+                        <span class="text-cyan-400 font-mono-tech">v5.1.2</span>
                     </div>
                 </div>
-                <div class="text-right hidden md:block">
-                    <div class="text-xs text-gray-400 uppercase tracking-wider">Database</div>
-                    <div class="text-pink-400 font-mono text-sm">847,293 Records</div>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex items-center gap-4 text-xs">
+                    <div class="flex items-center gap-2 px-3 py-1 rounded bg-black/40 border border-cyan-500/30">
+                        <span class="status-dot status-online"></span>
+                        <span class="text-gray-300">AI Core</span>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1 rounded bg-black/40 border border-cyan-500/30">
+                        <span class="status-dot" id="dbStatus"></span>
+                        <span class="text-gray-300">Database</span>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-gray-500 text-[10px] uppercase">Records</div>
+                        <div class="text-cyan-400 font-mono-tech" id="recordCount">0</div>
+                    </div>
                 </div>
-                <button id="emergencyBtn" class="px-4 py-2 border border-red-500/50 text-red-400 hover:bg-red-500/20 transition-all font-orbitron text-xs tracking-wider uppercase rounded">
-                    Emergency Stop
+                
+                <button onclick="emergencyStop()" class="cyber-btn danger px-4 py-2 rounded text-xs font-bold">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        HALT
+                    </span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Interface -->
-    <main class="relative z-10 container mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Main Layout -->
+    <main class="relative z-10 container mx-auto px-4 py-4 h-[calc(100vh-80px)] grid grid-cols-12 gap-4">
         
-        <!-- Left Panel - Controls -->
-        <aside class="lg:col-span-3 space-y-4">
-            <!-- Recognition Modes -->
-            <div class="holo-card rounded-lg p-6">
-                <div class="hud-corner top-left"></div>
-                <div class="hud-corner top-right"></div>
-                <div class="hud-corner bottom-left"></div>
-                <div class="hud-corner bottom-right"></div>
+        <!-- Left Sidebar - Controls & Database -->
+        <aside class="col-span-3 flex flex-col gap-4 overflow-hidden">
+            
+            <!-- Source Selection -->
+            <div class="holo-panel rounded-lg p-4 flex-shrink-0">
+                <div class="corner-accent corner-tl"></div>
+                <div class="corner-accent corner-br"></div>
                 
-                <h3 class="font-orbitron text-cyan-400 text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                    <span class="w-2 h-2 bg-cyan-400"></span>
-                    Recognition Modes
+                <h3 class="font-orbitron text-cyan-400 text-xs uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                    Input Source
                 </h3>
 
-                <div class="space-y-3">
-                    <label class="flex items-center justify-between p-3 rounded border border-cyan-500/30 cursor-pointer hover:bg-cyan-500/10 transition-all mode-option mode-active" data-mode="face">
-                        <span class="text-sm font-medium">Facial Recognition</span>
-                        <input type="checkbox" class="cyber-toggle" checked>
-                    </label>
-                    
-                    <label class="flex items-center justify-between p-3 rounded border border-cyan-500/30 cursor-pointer hover:bg-cyan-500/10 transition-all mode-option" data-mode="height">
-                        <span class="text-sm font-medium">Height Analysis</span>
-                        <input type="checkbox" class="cyber-toggle">
-                    </label>
-                    
-                    <label class="flex items-center justify-between p-3 rounded border border-cyan-500/30 cursor-pointer hover:bg-cyan-500/10 transition-all mode-option" data-mode="body">
-                        <span class="text-sm font-medium">Body Metrics</span>
-                        <input type="checkbox" class="cyber-toggle">
-                    </label>
-                    
-                    <label class="flex items-center justify-between p-3 rounded border border-cyan-500/30 cursor-pointer hover:bg-cyan-500/10 transition-all mode-option" data-mode="gait">
-                        <span class="text-sm font-medium">Gait Analysis</span>
-                        <input type="checkbox" class="cyber-toggle">
-                    </label>
-                </div>
-            </div>
-
-            <!-- System Controls -->
-            <div class="holo-card rounded-lg p-6">
-                <div class="hud-corner top-left"></div>
-                <div class="hud-corner bottom-right"></div>
-                
-                <h3 class="font-orbitron text-pink-400 text-sm uppercase tracking-wider mb-4">Input Source</h3>
-                
-                <div class="space-y-3">
-                    <button id="cameraBtn" class="w-full py-3 border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/20 transition-all font-orbitron text-xs uppercase tracking-wider rounded flex items-center justify-center gap-2 group">
-                        <svg class="w-4 h-4 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                <div class="space-y-2">
+                    <button onclick="activateLocalCamera()" class="cyber-btn w-full py-2 rounded text-xs flex items-center justify-center gap-2" id="btnLocalCam">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
-                        Activate Camera
+                        Local Camera
                     </button>
-                    
-                    <button id="uploadBtn" class="w-full py-3 border border-pink-500/50 text-pink-400 hover:bg-pink-500/20 transition-all font-orbitron text-xs uppercase tracking-wider rounded flex items-center justify-center gap-2">
+
+                    <div class="relative">
+                        <input type="text" id="ipCameraInput" placeholder="IP:PORT (e.g., 192.168.1.100:8080)" 
+                               class="cyber-input w-full px-3 py-2 rounded text-xs mb-2">
+                        <button onclick="connectIPCamera()" class="cyber-btn w-full py-2 rounded text-xs flex items-center justify-center gap-2" id="btnIPCam">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+                            </svg>
+                            Connect IP Cam
+                        </button>
+                    </div>
+
+                    <button onclick="document.getElementById('fileInput').click()" class="cyber-btn w-full py-2 rounded text-xs flex items-center justify-center gap-2 border-pink-500/40 text-pink-400 hover:text-pink-300">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
-                        Upload Image
+                        Upload Image/Video
                     </button>
-                    
-                    <input type="file" id="fileInput" class="hidden" accept="image/*">
+                    <input type="file" id="fileInput" class="hidden" accept="image/*,video/*" onchange="handleFileUpload(event)">
                 </div>
 
-                <div class="mt-6 pt-4 border-t border-cyan-500/20">
-                    <div class="flex justify-between text-xs mb-2">
-                        <span class="text-gray-400">Sensitivity</span>
-                        <span class="text-cyan-400 font-mono" id="sensitivityValue">85%</span>
+                <div class="mt-3 pt-3 border-t border-cyan-500/20">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-400">Stream Quality</span>
+                        <span class="text-cyan-400 font-mono-tech" id="qualityValue">HD</span>
                     </div>
-                    <input type="range" min="0" max="100" value="85" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-cyan-400" id="sensitivitySlider">
+                    <select id="qualitySelect" onchange="changeQuality(this.value)" class="cyber-input w-full px-2 py-1 rounded text-xs">
+                        <option value="sd">SD (480p)</option>
+                        <option value="hd" selected>HD (720p)</option>
+                        <option value="fhd">Full HD (1080p)</option>
+                        <option value="4k">4K (2160p)</option>
+                    </select>
                 </div>
             </div>
 
-            <!-- Live Metrics -->
-            <div class="holo-card rounded-lg p-4">
-                <h3 class="font-orbitron text-green-400 text-xs uppercase tracking-wider mb-3">Live Processing</h3>
-                <div class="space-y-2 font-mono text-xs">
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">FPS:</span>
-                        <span class="text-cyan-400" id="fpsCounter">60</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Latency:</span>
-                        <span class="text-green-400" id="latencyCounter">12ms</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Threads:</span>
-                        <span class="text-pink-400">16 Active</span>
-                    </div>
-                </div>
-                <div class="mt-3 h-16 bg-black/50 rounded border border-cyan-500/20 p-2 overflow-hidden">
-                    <div class="data-stream" id="dataStream">
-                        Initializing neural networks...<br>
-                        Loading biometric templates...<br>
-                        Calibrating sensors...
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Center - Main Display -->
-        <section class="lg:col-span-6">
-            <div class="holo-card rounded-lg p-1 h-full min-h-[500px] relative">
-                <div class="hud-corner top-left"></div>
-                <div class="hud-corner top-right"></div>
-                <div class="hud-corner bottom-left"></div>
-                <div class="hud-corner bottom-right"></div>
+            <!-- Recognition Modules -->
+            <div class="holo-panel rounded-lg p-4 flex-shrink-0">
+                <div class="corner-accent corner-tr"></div>
                 
-                <!-- Video/Canvas Container -->
-                <div class="video-container w-full h-full rounded bg-black relative overflow-hidden" id="mainDisplay">
-                    <video id="videoElement" class="w-full h-full object-cover hidden" autoplay playsinline></video>
-                    <canvas id="mainCanvas" class="w-full h-full object-cover"></canvas>
-                    
-                    <!-- Default State -->
-                    <div id="defaultState" class="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
-                        <div class="cyber-loader mb-6"></div>
-                        <h2 class="font-orbitron text-2xl text-cyan-400 mb-2 tracking-widest">STANDBY MODE</h2>
-                        <p class="text-gray-500 text-sm max-w-md">Select input source to begin multi-modal biometric analysis. System ready for facial, anthropometric, and kinematic identification.</p>
-                    </div>
-
-                    <!-- Scanning Overlay -->
-                    <div id="scanningOverlay" class="absolute inset-0 pointer-events-none hidden">
-                  
+                <h3 class="font-orbitron t
