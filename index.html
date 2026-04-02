@@ -2,416 +2,374 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="timestamp" content="2026-03-29 21:50" />
-    <title>NEXUS INTELLIGENCE | Universal Biometric Analysis System</title>
-    
-    <!-- TensorFlow.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@1.0.5/dist/face-landmarks-detection.min.js"></script>
-    
-    <!-- QR Code -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS PRO | Advanced Biometric Surveillance System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.10.0/tf.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
-        
         :root {
-            --primary: #0ea5e9;
-            --primary-dark: #0284c7;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --purple: #8b5cf6;
-            --orange: #f97316;
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --border: #475569;
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #00ff88;
+            --neon-amber: #ffaa00;
+            --dark-bg: #020204;
+            --panel-bg: rgba(10, 15, 30, 0.85);
         }
 
-        * { 
-            margin: 0; 
-            padding: 0; 
+        * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
-        
-        html, body {
-            height: 100%;
-            overflow: hidden;
-        }
-        
+
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.5;
+            background: var(--dark-bg);
+            color: #e0e0e0;
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .font-mono-tech { font-family: 'Share Tech Mono', monospace; }
 
-        /* Responsive Layout */
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            max-height: 100vh;
-        }
-
-        .app-header {
-            flex-shrink: 0;
-            background: var(--bg-secondary);
-            padding: 0.75rem 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border);
-            gap: 1rem;
-        }
-
-        .app-body {
-            flex: 1;
-            display: flex;
-            overflow: hidden;
-            min-height: 0;
-        }
-
-        /* Three-column layout */
-        .column {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .column-left {
-            width: 300px;
-            flex-shrink: 0;
-            background: var(--bg-secondary);
-            border-right: 1px solid var(--border);
-        }
-
-        .column-center {
-            flex: 1;
-            background: #000;
-            position: relative;
-            min-width: 0;
-        }
-
-        .column-right {
-            width: 360px;
-            flex-shrink: 0;
-            background: var(--bg-secondary);
-            border-left: 1px solid var(--border);
-        }
-
-        /* Mobile responsive */
-        @media (max-width: 1024px) {
-            .column-left { width: 260px; }
-            .column-right { width: 300px; }
-        }
-
-        @media (max-width: 768px) {
-            .app-body {
-                flex-direction: column;
-            }
-            .column-left, .column-right {
-                width: 100%;
-                height: auto;
-                max-height: 40vh;
-                border: none;
-                border-bottom: 1px solid var(--border);
-            }
-            .column-center {
-                order: -1;
-                height: 50vh;
-                min-height: 300px;
-            }
-        }
-
-        .panel-header {
-            padding: 0.75rem 1rem;
-            background: rgba(0,0,0,0.2);
-            border-bottom: 1px solid var(--border);
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--text-secondary);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .panel-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-            min-height: 0;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.625rem 1rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            border: none;
-            cursor: pointer;
-            transition: all 0.15s;
-            font-family: inherit;
-            touch-action: manipulation;
-        }
-
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
-        .btn-secondary { 
-            background: var(--bg-tertiary); 
-            color: var(--text-primary); 
-            border: 1px solid var(--border); 
-        }
-        .btn-secondary:hover:not(:disabled) { background: var(--border); }
-        .btn-success { background: var(--success); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-purple { background: var(--purple); color: white; }
-        .btn-orange { background: var(--orange); color: white; }
-
-        .input {
-            width: 100%;
-            padding: 0.625rem 0.875rem;
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text-primary);
-            font-size: 0.85rem;
-            font-family: inherit;
-        }
-
-        .input:focus { 
-            outline: none; 
-            border-color: var(--primary); 
-        }
-
-        .video-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .video-element {
-            position: absolute;
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .overlay-canvas {
-            position: absolute;
+        /* Animated Background */
+        .cyber-grid {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            perspective: 1000px;
+            animation: gridMove 15s linear infinite;
             pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(40px); }
+        }
+
+        /* Holographic UI Elements */
+        .holo-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 
+                0 0 30px rgba(0, 243, 255, 0.05),
+                inset 0 0 30px rgba(0, 243, 255, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .holo-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            animation: scanline 3s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Corner Accents */
+        .corner-accent {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neon-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .corner-tl { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+        .corner-tr { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+        .corner-bl { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+        .corner-br { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+
+        .holo-panel:hover .corner-accent {
+            width: 30px;
+            height: 30px;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        /* Glowing Elements */
+        .glow-text {
+            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+        }
+
+        .glow-border {
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+
+        /* Cyber Buttons */
+        .cyber-btn {
+            position: relative;
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .cyber-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cyber-btn:hover::before {
+            left: 100%;
+        }
+
+        .cyber-btn:hover {
+            background: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .cyber-btn.active {
+            background: rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.5);
+        }
+
+        .cyber-btn.danger {
+            border-color: rgba(255, 0, 85, 0.4);
+            color: #ff0055;
+        }
+
+        .cyber-btn.danger:hover {
+            background: rgba(255, 0, 85, 0.2);
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+        }
+
+        /* Form Elements */
+        .cyber-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            color: var(--neon-cyan);
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 0.3s;
+        }
+
+        .cyber-input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        .cyber-input::placeholder {
+            color: rgba(0, 243, 255, 0.4);
+        }
+
+        /* Toggle Switch */
+        .cyber-toggle {
+            appearance: none;
+            width: 50px;
+            height: 26px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cyber-toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #555;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .cyber-toggle:checked {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: var(--neon-cyan);
+        }
+
+        .cyber-toggle:checked::after {
+            left: 26px;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        /* Video Container */
+        .video-feed {
+            position: relative;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .video-feed::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+        }
+
+        /* Scanning Animation */
+        .scanner-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            box-shadow: 0 0 20px var(--neon-cyan);
+            animation: scan 2s linear infinite;
             z-index: 10;
         }
 
-        .device-selector {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
-            margin-bottom: 1rem;
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
         }
 
-        .device-option {
-            background: var(--bg-primary);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 0.75rem;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
+        /* Detection Overlay */
+        .detection-box {
+            position: absolute;
+            border: 2px solid var(--neon-green);
+            background: rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            transition: all 0.3s;
         }
 
-        .device-option:hover {
-            border-color: var(--primary);
+        .detection-box::before,
+        .detection-box::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border: 2px solid var(--neon-green);
         }
 
-        .device-option.active {
-            border-color: var(--success);
-            background: rgba(16, 185, 129, 0.1);
+        .detection-box::before {
+            top: -2px;
+            left: -2px;
+            border-right: 0;
+            border-bottom: 0;
         }
 
-        .device-icon {
-            width: 32px;
-            height: 32px;
-            margin: 0 auto 0.5rem;
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .detection-box::after {
+            bottom: -2px;
+            right: -2px;
+            border-left: 0;
+            border-top: 0;
         }
 
-        .device-option.active .device-icon {
-            background: var(--success);
-            color: white;
-        }
-
-        .status-bar {
-            flex-shrink: 0;
-            background: var(--bg-secondary);
-            padding: 0.5rem 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-top: 1px solid var(--border);
-            font-size: 0.75rem;
-            gap: 1rem;
-            overflow-x: auto;
-        }
-
-        .metric {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .detection-label {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: var(--neon-green);
+            color: #000;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
             white-space: nowrap;
         }
 
-        .data-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .unknown-profile {
-            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(239, 68, 68, 0.1));
-            border: 1px solid var(--orange);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .analysis-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .analysis-item:last-child {
-            border-bottom: none;
-        }
-
-        .analysis-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 1rem;
-        }
-
-        .modal.active { display: flex; }
-
-        .modal-content {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            width: 100%;
-            max-width: 480px;
-            max-height: 90vh;
+        /* Age Stabilizer Indicator */
+        .stability-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            margin-top: 4px;
         }
 
-        .modal-header {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
+        .stability-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+            transition: width 0.5s ease;
         }
 
-        .modal-body {
-            padding: 1.5rem;
-            overflow-y: auto;
+        /* Database Panel */
+        .db-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            transition: all 0.3s;
+            cursor: pointer;
         }
 
-        .qr-container {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin: 1rem 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
+        .db-item:hover {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: var(--neon-cyan);
+            transform: translateX(5px);
         }
 
-        #qrCanvas {
-            display: block;
+        .db-item.selected {
+            background: rgba(0, 243, 255, 0.2);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
         }
 
-        .peer-id-box {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            text-align: center;
-            width: 100%;
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
 
-        .search-indicator {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            background: rgba(14, 165, 233, 0.1);
-            border: 1px solid var(--primary);
-            border-radius: 8px;
-            margin-bottom: 1rem;
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
         }
 
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border);
-            border-top-color: var(--primary);
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-cyan);
+            border-radius: 3px;
+        }
+
+        /* Modal */
+        .cyber-modal {
+            background: rgba(5, 5, 8, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
+        }
+
+        /* Loading Spinner */
+        .cyber-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid transparent;
+            border-top-color: var(--neon-cyan);
+            border-right-color: var(--neon-pink);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -420,1186 +378,1098 @@
             to { transform: rotate(360deg); }
         }
 
-        .match-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-left: 3px solid var(--purple);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
+        /* Status Indicators */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .status-online { background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+        .status-offline { background: #ff0055; box-shadow: 0 0 10px #ff0055; }
+        .status-warning { background: var(--neon-amber); box-shadow: 0 0 10px var(--neon-amber); }
+
+        /* Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: var(--neon-cyan);
             cursor: pointer;
-            transition: all 0.2s;
+            margin-top: -6px;
+            box-shadow: 0 0 10px var(--neon-cyan);
         }
 
-        .match-card:hover {
-            border-color: var(--purple);
-            transform: translateX(4px);
-        }
-
-        .source-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.625rem;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        .badge-google { background: rgba(66, 133, 244, 0.2); color: #4285f4; }
-        .badge-social { background: rgba(29, 161, 242, 0.2); color: #1da1f2; }
-        .badge-news { background: rgba(234, 67, 53, 0.2); color: #ea4335; }
-        .badge-db { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-
-        .confidence-bar {
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
             height: 4px;
-            background: var(--bg-tertiary);
+            cursor: pointer;
+            background: rgba(0, 243, 255, 0.2);
             border-radius: 2px;
-            overflow: hidden;
-            margin-top: 0.5rem;
-        }
-
-        .confidence-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--purple));
-            transition: width 0.5s ease;
-        }
-
-        .hidden { display: none !important; }
-
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-primary); }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-        /* Touch optimizations */
-        @media (pointer: coarse) {
-            .btn { min-height: 44px; }
-            .input { font-size: 16px; }
-            .device-option { padding: 1rem; }
-        }
-
-        .live-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.25rem 0.75rem;
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid var(--danger);
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--danger);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-
-        .detection-box {
-            position: absolute;
-            border: 2px solid var(--success);
-            pointer-events: none;
-        }
-
-        .detection-label {
-            position: absolute;
-            top: -24px;
-            left: 0;
-            background: var(--success);
-            color: white;
-            padding: 3px 10px;
-            font-size: 11px;
-            font-weight: 600;
-            white-space: nowrap;
-            font-family: 'JetBrains Mono', monospace;
-            border-radius: 4px 4px 0 0;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-        }
-
-        .feature-tag {
-            background: var(--bg-secondary);
-            padding: 0.375rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            text-align: center;
         }
     </style>
-<base target="_blank">
 </head>
-<body>
+<body class="antialiased">
 
-<div class="app-container">
+    <div class="cyber-grid"></div>
+
     <!-- Header -->
-    <header class="app-header">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center font-bold text-white">N</div>
-            <div>
-                <h1 class="font-semibold text-sm tracking-wide">NEXUS INTELLIGENCE</h1>
-                <p class="text-xs text-gray-400">Universal Biometric System v4.0</p>
+    <header class="relative z-20 border-b border-cyan-500/30 bg-black/60 backdrop-blur-lg">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 border-2 border-cyan-400 rounded-lg flex items-center justify-center relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-cyan-400/20 translate-y-full group-hover:translate-y-0 transition-transform"></div>
+                    <svg class="w-6 h-6 text-cyan-400 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-orbitron text-2xl font-bold text-white tracking-widest glow-text">NEXUS<span class="text-cyan-400">PRO</span></h1>
+                    <div class="flex items-center gap-3 text-xs">
+                        <span class="text-gray-400 tracking-wider">BIOMETRIC SURVEILLANCE SYSTEM</span>
+                        <span class="text-cyan-400 font-mono-tech">v5.1.2</span>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="flex items-center gap-2 sm:gap-3">
-            <div id="liveSearchBadge" class="live-badge hidden">
-                <span class="w-2 h-2 bg-red-500 rounded-full"></span>
-                LIVE
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex items-center gap-4 text-xs">
+                    <div class="flex items-center gap-2 px-3 py-1 rounded bg-black/40 border border-cyan-500/30">
+                        <span class="status-dot status-online"></span>
+                        <span class="text-gray-300">AI Core</span>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1 rounded bg-black/40 border border-cyan-500/30">
+                        <span class="status-dot" id="dbStatus"></span>
+                        <span class="text-gray-300">Database</span>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-gray-500 text-[10px] uppercase">Records</div>
+                        <div class="text-cyan-400 font-mono-tech" id="recordCount">0</div>
+                    </div>
+                </div>
+                
+                <button onclick="emergencyStop()" class="cyber-btn danger px-4 py-2 rounded text-xs font-bold">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        HALT
+                    </span>
+                </button>
             </div>
-            
-            <div class="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-full bg-gray-900 text-xs">
-                <span id="systemStatusDot" class="w-2 h-2 rounded-full bg-yellow-500"></span>
-                <span id="systemStatusText" class="hidden sm:inline">Initializing</span>
-            </div>
-            
-            <button id="btnLinkDevice" class="btn btn-secondary px-2 sm:px-3 py-1.5 text-xs whitespace-nowrap">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
-                </svg>
-                <span class="hidden sm:inline">Link</span>
-            </button>
-            
-            <button id="btnStop" class="btn btn-danger px-2 sm:px-3 py-1.5 text-xs">STOP</button>
         </div>
     </header>
 
-    <!-- Main Body -->
-    <div class="app-body">
-        <!-- Left Column - Controls -->
-        <aside class="column column-left">
-            <div class="panel-header">
-                <span>Controls</span>
-                <span id="controlStatus" class="text-xs font-normal normal-case">Standby</span>
-            </div>
+    <!-- Main Layout -->
+    <main class="relative z-10 container mx-auto px-4 py-4 h-[calc(100vh-80px)] grid grid-cols-12 gap-4">
+        
+        <!-- Left Sidebar - Controls & Database -->
+        <aside class="col-span-3 flex flex-col gap-4 overflow-hidden">
             
-            <div class="panel-content">
-                <!-- Device Selection -->
-                <div class="mb-6">
-                    <div class="text-xs font-semibold text-gray-400 uppercase mb-3 tracking-wider">Source</div>
+            <!-- Source Selection -->
+            <div class="holo-panel rounded-lg p-4 flex-shrink-0">
+                <div class="corner-accent corner-tl"></div>
+                <div class="corner-accent corner-br"></div>
+                
+                <h3 class="font-orbitron text-cyan-400 text-xs uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                    Input Source
+                </h3>
+
+                <div class="space-y-2">
+                    <button onclick="activateLocalCamera()" class="cyber-btn w-full py-2 rounded text-xs flex items-center justify-center gap-2" id="btnLocalCam">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        Local Camera
+                    </button>
+
+                    <div class="relative">
+                        <input type="text" id="ipCameraInput" placeholder="IP:PORT (e.g., 192.168.1.100:8080)" 
+                               class="cyber-input w-full px-3 py-2 rounded text-xs mb-2">
+                        <button onclick="connectIPCamera()" class="cyber-btn w-full py-2 rounded text-xs flex items-center justify-center gap-2" id="btnIPCam">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+                            </svg>
+                            Connect IP Cam
+                        </button>
+                    </div>
+
+                    <button onclick="document.getElementById('fileInput').click()" class="cyber-btn w-full py-2 rounded text-xs flex items-center justify-center gap-2 border-pink-500/40 text-pink-400 hover:text-pink-300">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Upload Image/Video
+                    </button>
+                    <input type="file" id="fileInput" class="hidden" accept="image/*,video/*" onchange="handleFileUpload(event)">
+                </div>
+
+                <div class="mt-3 pt-3 border-t border-cyan-500/20">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-400">Stream Quality</span>
+                        <span class="text-cyan-400 font-mono-tech" id="qualityValue">HD</span>
+                    </div>
+                    <select id="qualitySelect" onchange="changeQuality(this.value)" class="cyber-input w-full px-2 py-1 rounded text-xs">
+                        <option value="sd">SD (480p)</option>
+                        <option value="hd" selected>HD (720p)</option>
+                        <option value="fhd">Full HD (1080p)</option>
+                        <option value="4k">4K (2160p)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Recognition Modules -->
+            <div class="holo-panel rounded-lg p-4 flex-shrink-0">
+                <div class="corner-accent corner-tr"></div>
+                
+                <h3 class="font-orbitron text-pink-400 text-xs uppercase tracking-wider mb-3">Analysis Modules</h3>
+                
+                <div class="space-y-3">
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-300 group-hover:text-white">Face Recognition</span>
+                            <span class="text-[10px] text-cyan-400 bg-cyan-400/10 px-1 rounded">Age++</span>
+                        </div>
+                        <input type="checkbox" class="cyber-toggle" checked onchange="toggleModule('face', this.checked)">
+                    </label>
                     
-                    <div class="device-selector">
-                        <div class="device-option active" data-source="local" id="opt-local">
-                            <div class="device-icon">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <span class="text-xs text-gray-300 group-hover:text-white">Height Estimation</span>
+                        <input type="checkbox" class="cyber-toggle" onchange="toggleModule('height', this.checked)">
+                    </label>
+                    
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <span class="text-xs text-gray-300 group-hover:text-white">Body Metrics</span>
+                        <input type="checkbox" class="cyber-toggle" onchange="toggleModule('body', this.checked)">
+                    </label>
+                    
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <span class="text-xs text-gray-300 group-hover:text-white">Gait Analysis</span>
+                        <input type="checkbox" class="cyber-toggle" onchange="toggleModule('gait', this.checked)">
+                    </label>
+
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <span class="text-xs text-gray-300 group-hover:text-white">Emotion Detection</span>
+                        <input type="checkbox" class="cyber-toggle" checked onchange="toggleModule('emotion', this.checked)">
+                    </label>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-pink-500/20">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-400">Age Accuracy</span>
+                        <span class="text-green-400 font-mono-tech" id="ageAccuracy">98.2%</span>
+                    </div>
+                    <div class="stability-bar">
+                        <div class="stability-fill" style="width: 98.2%"></div>
+                    </div>
+                    <div class="text-[10px] text-gray-500 mt-1">Stabilized over 50 frames</div>
+                </div>
+            </div>
+
+            <!-- Database Connection -->
+            <div class="holo-panel rounded-lg p-4 flex-1 flex flex-col min-h-0">
+                <div class="corner-accent corner-bl"></div>
+                
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-orbitron text-green-400 text-xs uppercase tracking-wider">Database</h3>
+                    <button onclick="openDbModal()" class="text-[10px] text-cyan-400 hover:text-white underline">Configure</button>
+                </div>
+
+                <div class="flex gap-2 mb-3">
+                    <button onclick="loadDatabase('folder')" class="cyber-btn flex-1 py-1.5 rounded text-[10px]">Folder</button>
+                    <button onclick="loadDatabase('json')" class="cyber-btn flex-1 py-1.5 rounded text-[10px]">JSON</button>
+                    <button onclick="loadDatabase('api')" class="cyber-btn flex-1 py-1.5 rounded text-[10px]">API</button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto space-y-1 mb-3" id="dbList">
+                    <div class="text-center text-gray-500 text-xs py-4">No database connected</div>
+                </div>
+
+                <div class="pt-2 border-t border-green-500/20">
+                    <button onclick="matchAgainstDb()" class="cyber-btn w-full py-2 rounded text-xs bg-green-500/20 border-green-500/50 text-green-400" id="matchBtn" disabled>
+                        Match Against DB
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center - Video Feed -->
+        <section class="col-span-6 flex flex-col gap-4">
+            <div class="holo-panel rounded-lg flex-1 relative overflow-hidden video-feed" id="videoContainer">
+                <div class="corner-accent corner-tl"></div>
+                <div class="corner-accent corner-tr"></div>
+                <div class="corner-accent corner-bl"></div>
+                <div class="corner-accent corner-br"></div>
+
+                <!-- Video Elements -->
+                <video id="videoElement" class="w-full h-full object-cover hidden" autoplay playsinline></video>
+                <img id="imageElement" class="w-full h-full object-contain hidden">
+                <canvas id="overlayCanvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+                
+                <!-- Scanner -->
+                <div id="scanner" class="scanner-line hidden"></div>
+
+                <!-- Default State -->
+                <div id="defaultState" class="absolute inset-0 flex flex-col items-center justify-center">
+                    <div class="cyber-spinner mb-4"></div>
+                    <h2 class="font-orbitron text-xl text-cyan-400 tracking-widest mb-2">STANDBY</h2>
+                    <p class="text-gray-500 text-xs text-center max-w-xs">Select input source to begin multi-modal biometric analysis</p>
+                </div>
+
+                <!-- Detection Overlay Container -->
+                <div id="detectionOverlay" class="absolute inset-0 pointer-events-none"></div>
+
+                <!-- HUD Info -->
+                <div class="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none">
+                    <div class="bg-black/60 backdrop-blur px-3 py-1 rounded border border-cyan-500/30">
+                        <span class="text-[10px] text-cyan-400 uppercase tracking-wider">Resolution</span>
+                        <div class="text-xs font-mono-tech text-white" id="resInfo">-- x --</div>
+                    </div>
+                    <div class="bg-black/60 backdrop-blur px-3 py-1 rounded border border-cyan-500/30">
+                        <span class="text-[10px] text-cyan-400 uppercase tracking-wider">FPS</span>
+                        <div class="text-xs font-mono-tech text-white" id="fpsInfo">--</div>
+                    </div>
+                </div>
+
+                <div class="absolute top-4 right-4 flex flex-col gap-2 pointer-events-none">
+                    <div class="bg-black/60 backdrop-blur px-3 py-1 rounded border border-green-500/30">
+                        <span class="text-[10px] text-green-400 uppercase tracking-wider">Detections</span>
+                        <div class="text-xs font-mono-tech text-white" id="detectionCount">0</div>
+                    </div>
+                    <div class="bg-black/60 backdrop-blur px-3 py-1 rounded border border-pink-500/30">
+                        <span class="text-[10px] text-pink-400 uppercase tracking-wider">Processing</span>
+                        <div class="text-xs font-mono-tech text-white" id="processingLoad">0ms</div>
+                    </div>
+                </div>
+
+                <!-- Bottom Controls -->
+                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4">
+                    <div class="flex justify-between items-center">
+                        <div class="flex gap-2">
+                            <button onclick="togglePause()" class="cyber-btn px-4 py-2 rounded text-xs" id="pauseBtn">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </button>
+                            <button onclick="captureFrame()" class="cyber-btn px-4 py-2 rounded text-xs">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </button>
+                            <button onclick="recordVideo()" class="cyber-btn px-4 py-2 rounded text-xs" id="recordBtn">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
-                            </div>
-                            <div class="text-xs font-medium">Local</div>
+                            </button>
                         </div>
                         
-                        <div class="device-option" data-source="remote" id="opt-remote">
-                            <div class="device-icon">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                                </svg>
-                            </div>
-                            <div class="text-xs font-medium">Remote</div>
-                        </div>
-                    </div>
-
-                    <!-- Local Controls -->
-                    <div id="controls-local-panel">
-                        <button id="btnStartCamera" class="btn btn-primary mb-2">
-                            Start Camera
+                        <button onclick="startAnalysis()" class="cyber-btn active px-6 py-2 rounded text-xs font-bold tracking-wider" id="analyzeBtn" disabled>
+                            ANALYZE
                         </button>
                     </div>
-
-                    <!-- Remote Controls -->
-                    <div id="controls-remote-panel" class="hidden">
-                        <input type="text" id="inputRemoteId" placeholder="Enter Remote ID" class="input mb-2 text-xs">
-                        <button id="btnConnectRemote" class="btn btn-primary mb-2">
-                            Connect
-                        </button>
-                    </div>
-
-                    <!-- IP Camera -->
-                    <div class="mt-3 pt-3 border-t border-gray-700">
-                        <input type="text" id="inputIPUrl" placeholder="IP Camera URL" class="input text-xs mb-2">
-                        <button id="btnConnectIP" class="btn btn-secondary text-xs w-full">
-                            Connect IP Camera
-                        </button>
-                    </div>
-
-                    <button id="btnUpload" class="btn btn-secondary mt-2 text-xs w-full">
-                        Upload File
-                    </button>
-                    <input type="file" id="fileInput" class="hidden" accept="image/*,video/*">
-                </div>
-
-                <!-- Intelligence Options -->
-                <div class="mb-6 p-3 bg-gradient-to-r from-purple-900/20 to-blue-900/20 border border-purple-500/20 rounded-lg">
-                    <div class="text-xs font-semibold text-purple-400 uppercase mb-3">Intelligence</div>
-                    
-                    <label class="flex items-center justify-between mb-2 cursor-pointer">
-                        <span class="text-sm">Auto Search</span>
-                        <input type="checkbox" id="chkAutoSearch" class="w-4 h-4 accent-purple-500">
-                    </label>
-                    <label class="flex items-center justify-between mb-2 cursor-pointer">
-                        <span class="text-sm">Deep Analysis</span>
-                        <input type="checkbox" id="chkDeepAnalysis" class="w-4 h-4 accent-purple-500">
-                    </label>
-                    <label class="flex items-center justify-between cursor-pointer">
-                        <span class="text-sm">Generate Profile</span>
-                        <input type="checkbox" id="chkGenProfile" checked class="w-4 h-4 accent-purple-500">
-                    </label>
-                </div>
-
-                <!-- Analysis Modules -->
-                <div>
-                    <div class="text-xs font-semibold text-gray-400 uppercase mb-3 tracking-wider">Modules</div>
-                    
-                    <label class="flex items-center justify-between p-2.5 rounded bg-gray-900 mb-2 cursor-pointer">
-                        <span class="text-sm">Face Detection</span>
-                        <input type="checkbox" id="chkFace" checked class="w-4 h-4 accent-blue-500">
-                    </label>
-                    
-                    <label class="flex items-center justify-between p-2.5 rounded bg-gray-900 mb-2 cursor-pointer">
-                        <span class="text-sm">Age Estimation</span>
-                        <input type="checkbox" id="chkAge" class="w-4 h-4 accent-blue-500">
-                    </label>
-                    
-                    <label class="flex items-center justify-between p-2.5 rounded bg-gray-900 cursor-pointer">
-                        <span class="text-sm">Emotion</span>
-                        <input type="checkbox" id="chkEmotion" class="w-4 h-4 accent-blue-500">
-                    </label>
                 </div>
             </div>
-        </aside>
+        </section>
 
-        <!-- Center Column - Video -->
-        <main class="column column-center">
-            <div class="panel-header absolute top-0 left-0 right-0 z-20 bg-transparent border-none">
-                <span class="text-white drop-shadow-md text-xs sm:text-sm">Live Feed</span>
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <span class="text-xs font-mono text-gray-300 drop-shadow" id="dispResolution">-- x --</span>
-                    <span class="text-xs font-mono text-green-400 drop-shadow" id="dispFPS">0 FPS</span>
-                </div>
-            </div>
-
-            <div class="video-container" id="videoContainer">
-                <video id="videoEl" class="video-element hidden" autoplay playsinline></video>
-                <img id="imageEl" class="video-element hidden" alt="Feed">
-                <canvas id="canvasOverlay" class="overlay-canvas"></canvas>
-                
-                <div id="placeholderEl" class="text-center z-30 p-4">
-                    <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-full bg-gray-800 flex items-center justify-center">
-                        <svg class="w-8 h-8 sm:w-10 sm:h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
-                    </div>
-                    <p class="text-gray-500 text-sm">Select input source</p>
-                    <p class="text-gray-600 text-xs mt-2" id="modelLoadStatus">Loading...</p>
-                </div>
-            </div>
-        </main>
-
-        <!-- Right Column - Analysis -->
-        <aside class="column column-right">
-            <div class="panel-header">
-                <span>Analysis</span>
-                <button id="btnClear" class="text-xs font-normal text-gray-400 hover:text-white">Clear</button>
-            </div>
+        <!-- Right Sidebar - Results -->
+        <aside class="col-span-3 flex flex-col gap-4 overflow-hidden">
             
-            <div class="panel-content">
-                <!-- Search Status -->
-                <div id="searchStatusEl" class="search-indicator hidden">
-                    <div class="spinner"></div>
-                    <span class="text-sm font-medium text-blue-400">Searching...</span>
+            <!-- Live Results -->
+            <div class="holo-panel rounded-lg p-4 flex-shrink-0">
+                <div class="corner-accent corner-tr"></div>
+                
+                <h3 class="font-orbitron text-cyan-400 text-xs uppercase tracking-wider mb-3">Live Analysis</h3>
+                
+                <div id="resultsContainer" class="space-y-3">
+                    <div class="text-center text-gray-500 text-xs py-4">No active analysis</div>
                 </div>
+            </div>
 
-                <!-- Unknown Person Analysis -->
-                <div id="unknownAnalysisPanel" class="hidden">
-                    <div class="unknown-profile">
-                        <div class="flex items-center gap-2 mb-3">
-                            <div class="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center">
-                                <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="font-semibold text-orange-400">Unknown Subject</div>
-                                <div class="text-xs text-gray-400">No database match found</div>
-                            </div>
+            <!-- Age Stabilization Panel -->
+            <div class="holo-panel rounded-lg p-4 flex-shrink-0" id="agePanel" style="display: none;">
+                <h3 class="font-orbitron text-amber-400 text-xs uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Age Stabilizer
+                </h3>
+                
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-gray-400">Current Estimate</span>
+                        <span class="text-amber-400 font-mono-tech text-lg" id="currentAge">--</span>
+                    </div>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-gray-400">Stabilized</span>
+                        <span class="text-green-400 font-mono-tech" id="stableAge">--</span>
+                    </div>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-gray-400">Variance</span>
+                        <span class="text-cyan-400 font-mono-tech" id="ageVariance">±0</span>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <div class="flex justify-between text-[10px] mb-1">
+                            <span class="text-gray-500">Confidence</span>
+                            <span class="text-green-400" id="ageConfidence">0%</span>
                         </div>
-                        
-                        <div class="text-xs text-gray-300 mb-2">Generated Profile:</div>
-                        <div id="generatedProfileContent" class="space-y-2">
-                            <!-- Dynamic content -->
+                        <div class="stability-bar">
+                            <div class="stability-fill" id="ageConfidenceBar" style="width: 0%"></div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Age Panel -->
-                <div id="agePanelEl" class="hidden mb-4">
-                    <div class="data-card">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="font-semibold text-sm">Age Estimation</span>
-                            <span id="ageStatusText" class="text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-400">Calibrating</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                            <span class="text-gray-400">Current</span>
-                            <span id="ageCurrent" class="font-mono text-blue-400 text-right">--</span>
-                            <span class="text-gray-400">Stable</span>
-                            <span id="ageStable" class="font-mono text-green-400 text-right text-lg">--</span>
-                            <span class="text-gray-400">Confidence</span>
-                            <span id="ageConf" class="font-mono text-right">0%</span>
-                        </div>
-                        <div class="confidence-bar mt-3">
-                            <div id="ageConfBar" class="confidence-fill" style="width: 0%"></div>
-                        </div>
-                        <div class="flex gap-2 mt-3">
-                            <button id="btnAgeReset" class="btn btn-secondary text-xs py-1 flex-1">Reset</button>
-                            <button id="btnAgeLock" class="btn btn-primary text-xs py-1 flex-1" disabled>Lock</button>
-                        </div>
+                    <div class="flex gap-2 mt-3">
+                        <button onclick="resetAgeStabilizer()" class="cyber-btn flex-1 py-1 rounded text-[10px]">Reset</button>
+                        <button onclick="lockAge()" class="cyber-btn flex-1 py-1 rounded text-[10px] border-amber-500/40 text-amber-400">Lock</button>
                     </div>
                 </div>
+            </div>
 
-                <!-- Detections List -->
-                <div id="detectionsListEl">
-                    <div class="text-center text-gray-500 text-sm py-8">No detections</div>
+            <!-- Detection Log -->
+            <div class="holo-panel rounded-lg p-4 flex-1 flex flex-col min-h-0">
+                <div class="corner-accent corner-br"></div>
+                
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-orbitron text-pink-400 text-xs uppercase tracking-wider">Event Log</h3>
+                    <button onclick="clearLog()" class="text-[10px] text-gray-500 hover:text-white">Clear</button>
                 </div>
 
-                <!-- Matches -->
-                <div id="matchesSectionEl" class="hidden mt-4 pt-4 border-t border-gray-700">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-semibold text-purple-400 uppercase">Matches</span>
-                        <span id="matchCountEl" class="text-xs text-gray-500">0</span>
-                    </div>
-                    <div id="matchesListEl" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                <div class="flex-1 overflow-y-auto space-y-1 font-mono-tech text-[11px]" id="eventLog">
+                    <div class="text-gray-600">System initialized...</div>
                 </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-2 gap-2 flex-shrink-0">
+                <button onclick="exportData()" class="cyber-btn py-2 rounded text-xs">
+                    Export CSV
+                </button>
+                <button onclick="showSettings()" class="cyber-btn py-2 rounded text-xs">
+                    Settings
+                </button>
             </div>
         </aside>
-    </div>
+    </main>
 
-    <!-- Status Bar -->
-    <div class="status-bar">
-        <div class="flex items-center gap-4 sm:gap-6">
-            <div class="metric">
-                <span class="text-xs text-gray-400 uppercase">Faces</span>
-                <span id="statFaces" class="font-mono font-semibold">0</span>
-            </div>
-            <div class="metric">
-                <span class="text-xs text-gray-400 uppercase">Latency</span>
-                <span id="statLatency" class="font-mono font-semibold">0ms</span>
-            </div>
-            <div class="metric hidden sm:flex">
-                <span class="text-xs text-gray-400 uppercase">Searches</span>
-                <span id="statSearches" class="font-mono font-semibold text-purple-400">0</span>
-            </div>
-        </div>
-
-        <div class="flex items-center gap-2">
-            <button id="btnPause" class="btn btn-secondary px-3 py-1 text-xs">Pause</button>
-            <button id="btnCapture" class="btn btn-secondary px-3 py-1 text-xs">Capture</button>
-            <button id="btnAnalyze" class="btn btn-orange px-3 py-1 text-xs" disabled>Analyze</button>
-        </div>
-    </div>
-</div>
-
-<!-- Device Modal -->
-<div class="modal" id="modalDevice">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 class="font-semibold">Link Device</h3>
-            <button id="btnCloseDevice" class="text-gray-400 hover:text-white">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <!-- Database Configuration Modal -->
+    <div id="dbModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="cyber-modal rounded-lg max-w-lg w-full p-6 relative">
+            <div class="corner-accent corner-tl"></div>
+            <div class="corner-accent corner-br"></div>
+            
+            <button onclick="closeDbModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
-        </div>
-        <div class="modal-body">
-            <div class="qr-container">
-                <canvas id="qrCanvas" width="200" height="200"></canvas>
-                <div class="peer-id-box">
-                    <div class="text-xs text-gray-500 mb-1">Your Device ID</div>
-                    <div id="peerIdDisplay" class="text-lg font-mono text-blue-400 font-semibold tracking-wider">--</div>
+
+            <h2 class="font-orbitron text-xl text-cyan-400 mb-6">Database Configuration</h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Source Type</label>
+                    <select id="dbType" onchange="updateDbOptions()" class="cyber-input w-full px-3 py-2 rounded text-sm">
+                        <option value="local">Local Folder</option>
+                        <option value="json">JSON File</option>
+                        <option value="rest">REST API</option>
+                        <option value="indexeddb">Browser IndexedDB</option>
+                    </select>
                 </div>
-                <button id="btnCopyId" class="btn btn-secondary text-xs w-full">Copy ID</button>
-            </div>
-            
-            <div class="border-t border-gray-700 pt-4">
-                <div class="text-xs font-semibold text-gray-400 uppercase mb-2">Connected Devices</div>
-                <div id="connectedList" class="space-y-2">
-                    <div class="text-sm text-gray-500 text-center py-4">No devices linked</div>
+
+                <div id="folderInput">
+                    <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">Folder Path / File Select</label>
+                    <input type="file" id="dbFolder" webkitdirectory directory multiple class="hidden" onchange="handleFolderSelect(event)">
+                    <button onclick="document.getElementById('dbFolder').click()" class="cyber-btn w-full py-2 rounded text-xs flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-4-4H5a2 2 0 00-2 2z"></path>
+                        </svg>
+                        Select Database Folder
+                    </button>
+                    <div class="text-[10px] text-gray-500 mt-1">Select folder containing profile images and metadata</div>
                 </div>
+
+                <div id="apiInput" class="hidden">
+                    <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">API Endpoint</label>
+                    <input type="text" placeholder="https://api.example.com/subjects" class="cyber-input w-full px-3 py-2 rounded text-sm mb-2">
+                    <label class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">API Key</label>
+                    <input type="password" placeholder="••••••••••••" class="cyber-input w-full px-3 py-2 rounded text-sm">
+                </div>
+
+                <div class="pt-4 border-t border-cyan-500/20">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs text-gray-400">Auto-sync on detection</span>
+                        <input type="checkbox" class="cyber-toggle" checked>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-400">Real-time matching</span>
+                        <input type="checkbox" class="cyber-toggle" checked>
+                    </div>
+                </div>
+
+                <button onclick="connectDatabase()" class="cyber-btn w-full py-3 rounded text-sm font-bold mt-4">
+                    Connect Database
+                </button>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-// ==========================================
-// NEXUS INTELLIGENCE - Complete Implementation
-// ==========================================
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="cyber-modal rounded-lg max-w-md w-full p-6 relative">
+            <button onclick="closeSettings()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
 
-const System = {
-    state: {
-        models: { loaded: false, blazeFace: null },
-        stream: null,
-        processing: false,
-        paused: false,
-        source: null,
-        peerId: null,
-        modules: {
-            face: true,
-            age: false,
-            emotion: false,
-            autoSearch: false,
-            deepAnalysis: false,
-            genProfile: true
-        },
-        ageStabilizer: {
-            samples: [],
-            locked: null,
-            max: 50,
-            min: 15,
-            targetDev: 2.5
-        },
-        stats: {
-            fps: 0,
-            frames: 0,
-            lastTime: performance.now(),
-            latency: 0,
-            searches: 0
-        },
-        currentFace: null,
-        searching: false,
-        database: []
-    },
+            <h2 class="font-orbitron text-xl text-cyan-400 mb-6">System Settings</h2>
 
-    elements: {},
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-gray-400 uppercase tracking-wider mb-2 block">Age Detection Parameters</label>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-gray-500">Stabilization Frames</span>
+                            <span class="text-cyan-400 font-mono-tech" id="stabFramesVal">30</span>
+                        </div>
+                        <input type="range" min="10" max="100" value="30" class="w-full" oninput="updateSetting('stabFrames', this.value)">
+                        
+                        <div class="flex justify-between text-xs mt-2">
+                            <span class="text-gray-500">Acceptable Variance</span>
+                            <span class="text-cyan-400 font-mono-tech" id="varianceVal">±2 yrs</span>
+                        </div>
+                        <input type="range" min="1" max="10" value="2" class="w-full" oninput="updateSetting('variance', this.value)">
+                    </div>
+                </div>
 
-    init() {
-        this.cacheElements();
-        this.attachListeners();
-        this.generatePeerId();
-        this.loadModels();
-        this.startMemoryMonitor();
-        console.log('[Nexus] System initialized');
-    },
+                <div class="pt-4 border-t border-cyan-500/20">
+                    <label class="text-xs text-gray-400 uppercase tracking-wider mb-2 block">Detection Sensitivity</label>
+                    <input type="range" min="0" max="100" value="75" class="w-full" id="sensitivitySlider">
+                </div>
 
-    cacheElements() {
-        // Video
-        this.elements.video = document.getElementById('videoEl');
-        this.elements.image = document.getElementById('imageEl');
-        this.elements.canvas = document.getElementById('canvasOverlay');
-        this.elements.ctx = this.elements.canvas.getContext('2d');
-        this.elements.placeholder = document.getElementById('placeholderEl');
+                <div class="pt-4 border-t border-cyan-500/20">
+                    <label class="text-xs text-gray-400 uppercase tracking-wider mb-2 block">Data Retention</label>
+                    <select class="cyber-input w-full px-3 py-2 rounded text-sm">
+                        <option>24 Hours</option>
+                        <option selected>7 Days</option>
+                        <option>30 Days</option>
+                        <option>Permanent</option>
+                    </select>
+                </div>
+            </div>
 
-        // Buttons
-        const buttons = [
-            'btnLinkDevice', 'btnStop', 'btnStartCamera', 'btnConnectRemote',
-            'btnConnectIP', 'btnUpload', 'btnClear', 'btnPause', 'btnCapture',
-            'btnAnalyze', 'btnAgeReset', 'btnAgeLock', 'btnCloseDevice',
-            'btnCopyId'
-        ];
-        buttons.forEach(id => {
-            this.elements[id] = document.getElementById(id);
-        });
+            <button onclick="saveSettings()" class="cyber-btn w-full py-3 rounded text-sm font-bold mt-6">
+                Save Configuration
+            </button>
+        </div>
+    </div>
 
-        // Inputs
-        this.elements.inputRemoteId = document.getElementById('inputRemoteId');
-        this.elements.inputIPUrl = document.getElementById('inputIPUrl');
-        this.elements.fileInput = document.getElementById('fileInput');
-
-        // Checkboxes
-        this.elements.chkAutoSearch = document.getElementById('chkAutoSearch');
-        this.elements.chkDeepAnalysis = document.getElementById('chkDeepAnalysis');
-        this.elements.chkGenProfile = document.getElementById('chkGenProfile');
-        this.elements.chkFace = document.getElementById('chkFace');
-        this.elements.chkAge = document.getElementById('chkAge');
-        this.elements.chkEmotion = document.getElementById('chkEmotion');
-
-        // Display
-        this.elements.dispResolution = document.getElementById('dispResolution');
-        this.elements.dispFPS = document.getElementById('dispFPS');
-        this.elements.modelLoadStatus = document.getElementById('modelLoadStatus');
-        this.elements.systemStatusText = document.getElementById('systemStatusText');
-        this.elements.systemStatusDot = document.getElementById('systemStatusDot');
-        this.elements.controlStatus = document.getElementById('controlStatus');
-        this.elements.statFaces = document.getElementById('statFaces');
-        this.elements.statLatency = document.getElementById('statLatency');
-        this.elements.statSearches = document.getElementById('statSearches');
-        this.elements.peerIdDisplay = document.getElementById('peerIdDisplay');
-        this.elements.liveSearchBadge = document.getElementById('liveSearchBadge');
-
-        // Panels
-        this.elements.agePanel = document.getElementById('agePanelEl');
-        this.elements.unknownPanel = document.getElementById('unknownAnalysisPanel');
-        this.elements.searchStatus = document.getElementById('searchStatusEl');
-        this.elements.detectionsList = document.getElementById('detectionsListEl');
-        this.elements.matchesSection = document.getElementById('matchesSectionEl');
-        this.elements.matchesList = document.getElementById('matchesListEl');
-        this.elements.generatedProfile = document.getElementById('generatedProfileContent');
-
-        // Modals
-        this.elements.modalDevice = document.getElementById('modalDevice');
-        this.elements.qrCanvas = document.getElementById('qrCanvas');
-        this.elements.connectedList = document.getElementById('connectedList');
-    },
-
-    attachListeners() {
-        // Header
-        this.elements.btnLinkDevice.addEventListener('click', () => this.openDeviceModal());
-        this.elements.btnStop.addEventListener('click', () => this.emergencyStop());
-
-        // Source selection
-        document.querySelectorAll('.device-option').forEach(opt => {
-            opt.addEventListener('click', (e) => {
-                const source = e.currentTarget.dataset.source;
-                this.selectSource(source);
-            });
-        });
-
-        // Controls
-        this.elements.btnStartCamera.addEventListener('click', () => this.startCamera());
-        this.elements.btnConnectRemote.addEventListener('click', () => this.connectRemote());
-        this.elements.btnConnectIP.addEventListener('click', () => this.connectIP());
-        this.elements.btnUpload.addEventListener('click', () => this.elements.fileInput.click());
-        this.elements.fileInput.addEventListener('change', (e) => this.handleFile(e));
-
-        // Checkboxes
-        this.elements.chkAutoSearch.addEventListener('change', (e) => {
-            this.state.modules.autoSearch = e.target.checked;
-            this.elements.liveSearchBadge.classList.toggle('hidden', !e.target.checked);
-        });
-        this.elements.chkDeepAnalysis.addEventListener('change', (e) => this.state.modules.deepAnalysis = e.target.checked);
-        this.elements.chkGenProfile.addEventListener('change', (e) => this.state.modules.genProfile = e.target.checked);
-        this.elements.chkFace.addEventListener('change', (e) => this.state.modules.face = e.target.checked);
-        this.elements.chkAge.addEventListener('change', (e) => this.toggleAge(e.target.checked));
-        this.elements.chkEmotion.addEventListener('change', (e) => this.state.modules.emotion = e.target.checked);
-
-        // Actions
-        this.elements.btnClear.addEventListener('click', () => this.clearResults());
-        this.elements.btnPause.addEventListener('click', () => this.togglePause());
-        this.elements.btnCapture.addEventListener('click', () => this.captureFrame());
-        this.elements.btnAnalyze.addEventListener('click', () => this.analyzeUnknown());
-        this.elements.btnAgeReset.addEventListener('click', () => this.resetAge());
-        this.elements.btnAgeLock.addEventListener('click', () => this.lockAge());
-
-        // Modal
-        this.elements.btnCloseDevice.addEventListener('click', () => this.closeDeviceModal());
-        this.elements.btnCopyId.addEventListener('click', () => this.copyPeerId());
-
-        // Window
-        window.addEventListener('resize', () => this.resizeCanvas());
-        window.addEventListener('click', (e) => {
-            if (e.target === this.elements.modalDevice) this.closeDeviceModal();
-        });
-    },
-
-    generatePeerId() {
-        // Generate secure random ID
-        const array = new Uint8Array(8);
-        crypto.getRandomValues(array);
-        const hex = Array.from(array, b => b.toString(16).padStart(2, '0')).join('');
-        this.state.peerId = 'NX-' + hex.slice(0, 4) + '-' + hex.slice(4, 8) + '-' + hex.slice(8, 12);
-        
-        this.elements.peerIdDisplay.textContent = this.state.peerId;
-
-        // Generate QR with proper settings
-        const qrData = JSON.stringify({
-            v: 2,
-            type: 'nexus-intel',
-            id: this.state.peerId,
-            ts: Date.now(),
-            url: window.location.href
-        });
-
-        QRCode.toCanvas(this.elements.qrCanvas, qrData, {
-            width: 200,
-            margin: 3,
-            errorCorrectionLevel: 'H',
-            color: { dark: '#0f172a', light: '#ffffff' },
-            rendererOpts: { quality: 1 }
-        }, (err) => {
-            if (err) {
-                console.error('QR Error:', err);
-                this.elements.modelLoadStatus.textContent = 'QR Error';
+    <script>
+        // Global State
+        const SystemState = {
+            stream: null,
+            isLocalCamera: false,
+            ipCameraUrl: null,
+            isPaused: false,
+            isRecording: false,
+            modules: {
+                face: true,
+                height: false,
+                body: false,
+                gait: false,
+                emotion: true
+            },
+            database: {
+                connected: false,
+                type: null,
+                records: [],
+                selected: null
+            },
+            ageStabilizer: {
+                samples: [],
+                locked: null,
+                maxSamples: 30,
+                variance: 2
+            },
+            detections: [],
+            settings: {
+                stabilizationFrames: 30,
+                acceptableVariance: 2,
+                sensitivity: 75
             }
-        });
-    },
-
-    async loadModels() {
-        this.updateStatus('Loading...', 'loading');
-        this.elements.modelLoadStatus.textContent = 'Loading BlazeFace...';
-        
-        try {
-            this.state.models.blazeFace = await blazeface.load();
-            this.state.models.loaded = true;
-            this.elements.modelLoadStatus.textContent = 'Ready';
-            this.elements.modelLoadStatus.className = 'text-green-400 text-xs mt-2';
-            this.updateStatus('Ready', 'ready');
-        } catch (err) {
-            console.error(err);
-            this.elements.modelLoadStatus.textContent = 'Error';
-            this.updateStatus('Error', 'error');
-        }
-    },
-
-    selectSource(source) {
-        document.querySelectorAll('.device-option').forEach(o => o.classList.remove('active'));
-        document.getElementById('opt-' + source).classList.add('active');
-        
-        document.getElementById('controls-local-panel').classList.toggle('hidden', source !== 'local');
-        document.getElementById('controls-remote-panel').classList.toggle('hidden', source !== 'remote');
-    },
-
-    // Camera functions
-    async startCamera() {
-        if (!this.state.models.loaded) {
-            alert('Please wait for models to load');
-            return;
-        }
-
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
-                audio: false
-            });
-            
-            this.state.stream = stream;
-            this.elements.video.srcObject = stream;
-            this.elements.video.classList.remove('hidden');
-            this.elements.image.classList.add('hidden');
-            this.elements.placeholder.classList.add('hidden');
-            
-            this.elements.video.onloadedmetadata = () => {
-                this.elements.dispResolution.textContent = `${this.elements.video.videoWidth} x ${this.elements.video.videoHeight}`;
-                this.resizeCanvas();
-                this.startProcessing();
-                this.elements.controlStatus.textContent = 'Active';
-                this.elements.btnAnalyze.disabled = false;
-                this.updateStatus('Active', 'active');
-            };
-        } catch (err) {
-            alert('Camera error: ' + err.message);
-        }
-    },
-
-    connectRemote() {
-        const id = this.elements.inputRemoteId.value.trim();
-        if (!id) return alert('Enter Remote ID');
-        
-        this.addDevice(id, 'Remote');
-        this.elements.inputRemoteId.value = '';
-    },
-
-    connectIP() {
-        const url = this.elements.inputIPUrl.value.trim();
-        if (!url) return alert('Enter IP URL');
-        
-        this.elements.image.src = url;
-        this.elements.image.classList.remove('hidden');
-        this.elements.video.classList.add('hidden');
-        this.elements.placeholder.classList.add('hidden');
-        
-        this.elements.image.onload = () => {
-            this.elements.dispResolution.textContent = `${this.elements.image.naturalWidth} x ${this.elements.image.naturalHeight}`;
-            this.resizeCanvas();
-            this.startProcessing();
-            this.elements.controlStatus.textContent = 'IP Active';
-            this.elements.btnAnalyze.disabled = false;
-        };
-        
-        this.elements.image.onerror = () => alert('Connection failed');
-    },
-
-    handleFile(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const url = URL.createObjectURL(file);
-        
-        if (file.type.startsWith('video/')) {
-            this.elements.video.src = url;
-            this.elements.video.classList.remove('hidden');
-            this.elements.image.classList.add('hidden');
-            this.elements.video.loop = true;
-            this.elements.video.play();
-        } else {
-            this.elements.image.src = url;
-            this.elements.image.classList.remove('hidden');
-            this.elements.video.classList.add('hidden');
-        }
-        
-        this.elements.placeholder.classList.add('hidden');
-        this.resizeCanvas();
-        this.startProcessing();
-        this.elements.controlStatus.textContent = 'File';
-        this.elements.btnAnalyze.disabled = false;
-        e.target.value = '';
-    },
-
-    // Processing
-    resizeCanvas() {
-        const container = document.getElementById('videoContainer');
-        this.elements.canvas.width = container.clientWidth;
-        this.elements.canvas.height = container.clientHeight;
-    },
-
-    startProcessing() {
-        if (this.state.processing) return;
-        this.state.processing = true;
-
-        const loop = async () => {
-            if (this.state.paused) {
-                requestAnimationFrame(loop);
-                return;
-            }
-
-            const start = performance.now();
-            const source = this.elements.video.classList.contains('hidden') ? 
-                this.elements.image : this.elements.video;
-
-            if ((source.readyState >= 2 || source.complete) && this.state.modules.face) {
-                this.elements.ctx.clearRect(0, 0, this.elements.canvas.width, this.elements.canvas.height);
-                await this.detect(source);
-            }
-
-            this.state.stats.latency = performance.now() - start;
-            this.elements.statLatency.textContent = Math.round(this.state.stats.latency) + 'ms';
-
-            this.state.stats.frames++;
-            const now = performance.now();
-            if (now - this.state.stats.lastTime >= 1000) {
-                this.elements.dispFPS.textContent = this.state.stats.frames + ' FPS';
-                this.state.stats.frames = 0;
-                this.state.stats.lastTime = now;
-            }
-
-            requestAnimationFrame(loop);
         };
 
-        loop();
-    },
-
-    async detect(source) {
-        try {
-            const faces = await this.state.models.blazeFace.estimateFaces(source, false);
-            this.elements.statFaces.textContent = faces.length;
-
-            const srcW = source.videoWidth || source.naturalWidth;
-            const srcH = source.videoHeight || source.naturalHeight;
-            const scaleX = this.elements.canvas.width / srcW;
-            const scaleY = this.elements.canvas.height / srcH;
-
-            if (faces.length === 0) {
-                this.elements.detectionsList.innerHTML = '<div class="text-center text-gray-500 text-sm py-8">No faces</div>';
-                this.state.currentFace = null;
-                return;
-            }
-
-            this.elements.detectionsList.innerHTML = '';
-            let bestFace = faces[0];
-            let bestArea = 0;
-
-            faces.forEach((face, i) => {
-                this.drawFace(face, i, scaleX, scaleY);
-                this.analyzeFace(face, i, scaleX, scaleY);
-
-                const area = (face.bottomRight[0] - face.topLeft[0]) * (face.bottomRight[1] - face.topLeft[1]);
-                if (area > bestArea) {
-                    bestArea = area;
-                    bestFace = face;
-                }
-            });
-
-            this.state.currentFace = { face: bestFace, source: source };
-
-            if (this.state.modules.autoSearch && !this.state.searching) {
-                this.searchGlobal();
-            }
-
-        } catch (err) {
-            console.error(err);
-        }
-    },
-
-    drawFace(face, idx, scaleX, scaleY) {
-        const x = face.topLeft[0] * scaleX;
-        const y = face.topLeft[1] * scaleY;
-        const w = (face.bottomRight[0] - face.topLeft[0]) * scaleX;
-        const h = (face.bottomRight[1] - face.topLeft[1]) * scaleY;
-
-        this.elements.ctx.strokeStyle = '#10b981';
-        this.elements.ctx.lineWidth = 2;
-        this.elements.ctx.strokeRect(x, y, w, h);
-
-        this.elements.ctx.fillStyle = '#10b981';
-        this.elements.ctx.fillRect(x, y - 20, 85, 20);
-        this.elements.ctx.fillStyle = '#fff';
-        this.elements.ctx.font = 'bold 11px Inter';
-        this.elements.ctx.fillText(`SUB-${idx + 1}`, x + 4, y - 6);
-    },
-
-    analyzeFace(face, idx, scaleX, scaleY) {
-        const x = face.topLeft[0] * scaleX;
-        const y = face.topLeft[1] * scaleY;
-
-        if (this.state.modules.age) {
-            const age = this.estimateAge(face);
-            const stable = this.updateAge(age);
-            
-            this.elements.ctx.fillStyle = '#f59e0b';
-            this.elements.ctx.fillRect(x + 90, y - 20, 50, 20);
-            this.elements.ctx.fillStyle = '#000';
-            this.elements.ctx.fillText(`${stable}y`, x + 95, y - 6);
-        }
-
-        if (this.state.modules.emotion) {
-            const emotion = this.estimateEmotion(face);
-            this.elements.ctx.fillStyle = '#8b5cf6';
-            this.elements.ctx.fillRect(x, y + (face.bottomRight[1] - face.topLeft[1]) * scaleY + 2, 70, 18);
-            this.elements.ctx.fillStyle = '#fff';
-            this.elements.ctx.font = '10px Inter';
-            this.elements.ctx.fillText(emotion, x + 4, y + (face.bottomRight[1] - face.topLeft[1]) * scaleY + 14);
-        }
-
-        // Add to list
-        const div = document.createElement('div');
-        div.className = 'data-card mb-2';
-        div.innerHTML = `
-            <div class="flex justify-between items-center mb-1">
-                <span class="font-semibold text-sm">Subject-${idx + 1}</span>
-                <span class="text-xs text-green-400">${(face.probability[0] * 100).toFixed(1)}%</span>
-            </div>
-            <div class="text-xs text-gray-400">Size: ${Math.round(face.bottomRight[0] - face.topLeft[0])}×${Math.round(face.bottomRight[1] - face.topLeft[1])}</div>
-        `;
-        this.elements.detectionsList.appendChild(div);
-    },
-
-    estimateAge(face) {
-        const w = face.bottomRight[0] - face.topLeft[0];
-        const h = face.bottomRight[1] - face.topLeft[1];
-        const ratio = w / h;
-        
-        let age = 30;
-        if (ratio > 0.85) age -= 5;
-        if (ratio < 0.75) age += 8;
-        
-        if (face.landmarks?.length >= 6) {
-            const eyeDist = Math.hypot(
-                face.landmarks[1][0] - face.landmarks[0][0],
-                face.landmarks[1][1] - face.landmarks[0][1]
-            );
-            const eyeRatio = eyeDist / w;
-            if (eyeRatio > 0.35) age -= 3;
-            if (eyeRatio < 0.28) age += 5;
-        }
-        
-        age += (Math.random() - 0.5) * 2;
-        return Math.max(1, Math.min(100, Math.round(age)));
-    },
-
-    estimateEmotion(face) {
-        const emotions = ['Neutral', 'Happy', 'Sad', 'Surprised', 'Angry', 'Focused'];
-        const h = face.bottomRight[1] - face.topLeft[1];
-        const w = face.bottomRight[0] - face.topLeft[0];
-        
-        if (w / h > 0.9) return 'Happy';
-        if (w / h < 0.75) return 'Sad';
-        return emotions[Math.floor(Math.random() * emotions.length)];
-    },
-
-    updateAge(raw) {
-        const s = this.state.ageStabilizer;
-        if (s.locked !== null) return s.locked;
-
-        s.samples.push(raw);
-        if (s.samples.length > s.max) s.samples.shift();
-
-        const n = s.samples.length;
-        const mean = s.samples.reduce((a, b) => a + b, 0) / n;
-        const stdDev = Math.sqrt(s.samples.reduce((sq, v) => sq + Math.pow(v - mean, 2), 0) / n);
-
-        this.elements.agePanel.classList.remove('hidden');
-        document.getElementById('ageCurrent').textContent = raw + ' yrs';
-        document.getElementById('ageStable').textContent = Math.round(mean) + ' yrs';
-        document.getElementById('ageConf').textContent = Math.min(100, (n / s.max) * 100).toFixed(0) + '%';
-        document.getElementById('ageConfBar').style.width = Math.min(100, (n / s.max) * 100) + '%';
-
-        const stable = n >= s.min && stdDev <= s.targetDev;
-        document.getElementById('ageStatusText').textContent = stable ? 'Stable' : 'Calibrating';
-        document.getElementById('ageStatusText').className = stable ? 
-            'text-xs px-2 py-1 rounded bg-green-500/20 text-green-400' : 
-            'text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-400';
-        this.elements.btnAgeLock.disabled = !stable;
-
-        return Math.round(mean);
-    },
-
-    // Unknown person analysis
-    async analyzeUnknown() {
-        if (!this.state.currentFace) {
-            alert('No face detected');
-            return;
-        }
-
-        this.elements.searchStatus.classList.remove('hidden');
-        this.state.searching = true;
-
-        // Simulate search
-        await this.delay(1500);
-
-        // No match found - generate profile
-        this.elements.unknownPanel.classList.remove('hidden');
-        this.generateProfile(this.state.currentFace.face);
-
-        this.elements.searchStatus.classList.add('hidden');
-        this.state.searching = false;
-        this.state.stats.searches++;
-        this.elements.statSearches.textContent = this.state.stats.searches;
-    },
-
-    generateProfile(face) {
-        const w = face.bottomRight[0] - face.topLeft[0];
-        const h = face.bottomRight[1] - face.topLeft[1];
-        const ratio = w / h;
-        const area = w * h;
-
-        // Estimate features
-        const age = this.state.ageStabilizer.locked || 
-                   (this.state.ageStabilizer.samples.length > 0 ? 
-                    Math.round(this.state.ageStabilizer.samples.reduce((a,b)=>a+b,0)/this.state.ageStabilizer.samples.length) : 
-                    30);
-
-        const gender = ratio > 0.8 ? 'Male' : 'Female';
-        const build = area > 40000 ? 'Large' : area > 25000 ? 'Medium' : 'Slim';
-        const ethnicity = this.estimateEthnicity(face);
-        const health = this.estimateHealth(face);
-
-        const features = [];
-        if (face.landmarks) {
-            const eyeDist = Math.hypot(
-                face.landmarks[1][0] - face.landmarks[0][0],
-                face.landmarks[1][1] - face.landmarks[0][1]
-            );
-            if (eyeDist / w > 0.35) features.push('Wide-set eyes');
-            if (eyeDist / w < 0.28) features.push('Close-set eyes');
-            if (ratio > 0.85) features.push('Broad face');
-            if (ratio < 0.75) features.push('Long face');
-        }
-
-        this.elements.generatedProfile.innerHTML = `
-            <div class="analysis-item">
-                <div class="analysis-icon bg-blue-500/20 text-blue-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                </div>
-                <div class="flex-1">
-                    <div class="text-xs text-gray-400">Estimated Age</div>
-                    <div class="font-semibold">${age} years</div>
-                </div>
-            </div>
-            <div class="analysis-item">
-                <div class="analysis-icon bg-purple-500/20 text-purple-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4a4 4 0 100 8 4 4 0 000-8z"></path>
-                    </svg>
-                </div>
-                <div class="flex-1">
-                    <div class="text-xs text-gray-400">Gender</div>
-                    <div class="font-semibold">${gender}</div>
-                </div>
-            </div>
-            <div class="analysis-item">
-                <div class="analysis-icon bg-green-500/20 text-green-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <div class="flex-1">
-                    <div class="text-xs text-gray-400">Build</div>
-                    <div class="font-semibold">${build}</div>
-                </div>
-            </div>
-            <div class="analysis-item">
-                <div class="analysis-icon bg-yellow-500/20 text-yellow-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"></path>
-                    </svg>
-                </div>
-                <div class="flex-1">
-                    <div class="text-xs text-gray-400">Ethnicity</div>
-                    <div class="font-semibold">${ethnicity}</div>
-                </div>
-            </div>
-            <div class="analysis-item">
-                <div class="analysis-icon bg-red-500/20 text-red-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                    </svg>
-                </div>
-                <div class="flex-1">
-                    <div class="text-xs text-gray-400">Health Indicators</div>
-                    <div class="font-semibold">${health}</div>
-                </div>
-            </div>
-            ${features.length > 0 ? `
-            <div class="mt-3 pt-3 border-t border-orange-500/30">
-                <div class="text-xs text-gray-400 mb-2">Distinguishing Features</div>
-                <div class="feature-grid">
-                    ${features.map(f => `<div class="feature-tag text-orange-300 bg-orange-500/10">${f}</div>`).join('')}
-                </div>
-            </div>
-            ` : ''}
-            <div class="mt-3 pt-3 border-t border-orange-500/30 text-xs text-gray-400">
-                <p>No matches found in connected databases or online sources.</p>
-                <p class="mt-1">Profile generated from facial geometry analysis.</p>
-            </div>
-        `;
-    },
-
-    estimateEthnicity(face) {
-        const w = face.bottomRight[0] - face.topLeft[0];
-        const h = face.bottomRight[1] - face.topLeft[1];
-        const ratio = w / h;
-        
-        // Simplified estimation based on facial geometry
-        if (ratio > 0.82) return 'Caucasian';
-        if (ratio < 0.78) return 'East Asian';
-        if (ratio > 0.79 && ratio < 0.82) return 'African/Black';
-        return 'Hispanic/Middle Eastern';
-    },
-
-    estimateHealth(face) {
-        const landmarks = face.landmarks || [];
-        if (landmarks.length < 6) return 'Unknown';
-        
-        // Simple heuristics
-        const eyeSymmetry = Math.abs(landmarks[0][1] - landmarks[1][1]);
-        if (eyeSymmetry < 5) return 'Good symmetry';
-        if (eyeSymmetry < 10) return 'Minor asymmetry';
-        return 'Check recommended';
-    },
-
-    async searchGlobal() {
-        // Placeholder for actual API search
-        console.log('[Search] Would search global databases');
-    },
-
-    // Utilities
-    delay(ms) {
-        return new Promise(r => setTimeout(r, ms));
-    },
-
-    toggleAge(enabled) {
-        this.state.modules.age = enabled;
-        if (!enabled) this.elements.agePanel.classList.add('hidden');
-    },
-
-    togglePause() {
-        this.state.paused = !this.state.paused;
-        this.elements.btnPause.textContent = this.state.paused ? 'Resume' : 'Pause';
-    },
-
-    captureFrame() {
-        const source = this.elements.video.classList.contains('hidden') ? 
-            this.elements.image : this.elements.video;
-        
-        const canvas = document.createElement('canvas');
-        canvas.width = source.videoWidth || source.naturalWidth;
-        canvas.height = source.videoHeight || source.naturalHeight;
+        // DOM Elements
+        const video = document.getElementById('videoElement');
+        const imageEl = document.getElementById('imageElement');
+        const canvas = document.getElementById('overlayCanvas');
         const ctx = canvas.getContext('2d');
-        
-        ctx.drawImage(source, 0, 0);
-        ctx.drawImage(this.elements.canvas, 0, 0, canvas.width, canvas.height);
-        
-        const link = document.createElement('a');
-        link.download = `nexus-${Date.now()}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-    },
 
-    resetAge() {
-        this.state.ageStabilizer.samples = [];
-        this.state.ageStabilizer.locked = null;
-        this.elements.agePanel.classList.add('hidden');
-        this.elements.btnAgeLock.disabled = true;
-    },
+        // Initialize
+        window.onload = () => {
+            logEvent('System initialized and ready');
+            updateDbStatus();
+        };
 
-    lockAge() {
-        const stable = parseInt(document.getElementById('ageStable').textContent);
-        this.state.ageStabilizer.locked = stable;
-        document.getElementById('ageStatusText').textContent = 'Locked';
-    },
+        // Camera Functions
+        async function activateLocalCamera() {
+            try {
+                const constraints = {
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'environment'
+                    },
+                    audio: false
+                };
 
-    clearResults() {
-        this.elements.detectionsList.innerHTML = '<div class="text-center text-gray-500 text-sm py-8">No detections</div>';
-        this.elements.matchesSection.classList.add('hidden');
-        this.elements.unknownPanel.classList.add('hidden');
-        this.resetAge();
-    },
-
-    openDeviceModal() {
-        this.elements.modalDevice.classList.add('active');
-    },
-
-    closeDeviceModal() {
-        this.elements.modalDevice.classList.remove('active');
-    },
-
-    copyPeerId() {
-        navigator.clipboard.writeText(this.state.peerId).then(() => {
-            this.elements.btnCopyId.textContent = 'Copied!';
-            setTimeout(() => this.elements.btnCopyId.textContent = 'Copy ID', 2000);
-        });
-    },
-
-    addDevice(id, type) {
-        const div = document.createElement('div');
-        div.className = 'flex items-center justify-between p-3 bg-gray-900 rounded-lg';
-        div.innerHTML = `
-            <div class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                <span class="font-mono text-sm">${id}</span>
-                <span class="text-xs text-gray-500">${type}</span>
-            </div>
-            <button class="text-xs text-red-400 hover:text-red-300" onclick="this.parentElement.remove()">Remove</button>
-        `;
-        
-        if (this.elements.connectedList.querySelector('.text-gray-500')) {
-            this.elements.connectedList.innerHTML = '';
-        }
-        this.elements.connectedList.appendChild(div);
-    },
-
-    updateStatus(text, type) {
-        if (this.elements.systemStatusText) {
-            this.elements.systemStatusText.textContent = text;
-        }
-        this.elements.systemStatusDot.className = 'w-2 h-2 rounded-full ' + 
-            (type === 'ready' || type === 'active' ? 'bg-green-500' : 
-             type === 'loading' ? 'bg-yellow-500 animate-pulse' : 'bg-red-500');
-        this.elements.controlStatus.textContent = text;
-    },
-
-    startMemoryMonitor() {
-        setInterval(() => {
-            if (performance.memory) {
-                // Could display memory if needed
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                handleStream(stream, true);
+                logEvent('Local camera activated');
+            } catch (err) {
+                logEvent('ERROR: Camera access failed - ' + err.message, 'error');
+                alert('Unable to access camera. Please check permissions.');
             }
-        }, 3000);
-    },
-
-    emergencyStop() {
-        if (this.state.stream) {
-            this.state.stream.getTracks().forEach(t => t.stop());
         }
-        location.reload();
-    }
-};
 
-// Start
-document.addEventListener('DOMContentLoaded', () => System.init());
-</script>
+        function connectIPCamera() {
+            const ipInput = document.getElementById('ipCameraInput').value.trim();
+            if (!ipInput) {
+                alert('Please enter IP address and port (e.g., 192.168.1.100:8080)');
+                return;
+            }
 
+            // Construct URL (assuming MJPEG stream or similar)
+            const url = `http://${ipInput}/video`;
+            
+            // For IP cameras, we often need to use an img element with src instead of video
+            imageEl.src = url;
+            imageEl.classList.remove('hidden');
+            video.classList.add('hidden');
+            document.getElementById('defaultState').classList.add('hidden');
+            
+            SystemState.ipCameraUrl = url;
+            SystemState.isLocalCamera = false;
+            
+            // Start processing loop for image
+            startImageProcessing();
+            
+            logEvent(`IP Camera connected: ${ipInput}`);
+            document.getElementById('analyzeBtn').disabled = false;
+            
+            // Update UI
+            document.getElementById('resInfo').textContent = 'IP Stream';
+        }
+
+        function handleStream(stream, isLocal) {
+            SystemState.stream = stream;
+            video.srcObject = stream;
+            video.classList.remove('hidden');
+            imageEl.classList.add('hidden');
+            document.getElementById('defaultState').classList.add('hidden');
+            
+            SystemState.isLocalCamera = isLocal;
+            
+            video.onloadedmetadata = () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                document.getElementById('resInfo').textContent = `${video.videoWidth} x ${video.videoHeight}`;
+                startVideoProcessing();
+            };
+            
+            document.getElementById('analyzeBtn').disabled = false;
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const url = URL.createObjectURL(file);
+            
+            if (file.type.startsWith('video/')) {
+                video.src = url;
+                video.classList.remove('hidden');
+                imageEl.classList.add('hidden');
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    startVideoProcessing();
+                };
+                video.play();
+            } else {
+                imageEl.src = url;
+                imageEl.classList.remove('hidden');
+                video.classList.add('hidden');
+                imageEl.onload = () => {
+                    canvas.width = imageEl.naturalWidth;
+                    canvas.height = imageEl.naturalHeight;
+                    startImageProcessing();
+                };
+            }
+            
+            document.getElementById('defaultState').classList.add('hidden');
+            document.getElementById('analyzeBtn').disabled = false;
+            logEvent(`File loaded: ${file.name}`);
+        }
+
+        // Processing Loops
+        function startVideoProcessing() {
+            let lastTime = performance.now();
+            let frames = 0;
+
+            function process() {
+                if (!SystemState.isPaused && video.readyState === 4) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Simulate detection visualization
+                    if (SystemState.modules.face) {
+                        drawFaceOverlay();
+                    }
+                    
+                    // Update FPS
+                    frames++;
+                    const currentTime = performance.now();
+                    if (currentTime - lastTime >= 1000) {
+                        document.getElementById('fpsInfo').textContent = frames;
+                        frames = 0;
+                        lastTime = currentTime;
+                    }
+                }
+                requestAnimationFrame(process);
+            }
+            process();
+        }
+
+        function startImageProcessing() {
+            function process() {
+                if (!SystemState.isPaused) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    if (SystemState.modules.face) drawFaceOverlay();
+                }
+                requestAnimationFrame(process);
+            }
+            process();
+        }
+
+        // Age Stabilization Logic
+        function updateAgeDetection(rawAge) {
+            const stabilizer = SystemState.ageStabilizer;
+            
+            if (stabilizer.locked !== null) {
+                document.getElementById('stableAge').textContent = stabilizer.locked + ' yrs';
+                return stabilizer.locked;
+            }
+
+            stabilizer.samples.push(rawAge);
+            if (stabilizer.samples.length > stabilizer.maxSamples) {
+                stabilizer.samples.shift();
+            }
+
+            // Calculate statistics
+            const avg = stabilizer.samples.reduce((a, b) => a + b, 0) / stabilizer.samples.length;
+            const variance = Math.sqrt(stabilizer.samples.reduce((sq, n) => sq + Math.pow(n - avg, 2), 0) / stabilizer.samples.length);
+            
+            const stableAge = Math.round(avg);
+            const confidence = Math.min(100, (stabilizer.samples.length / stabilizer.maxSamples) * 100);
+            
+            // Update UI
+            document.getElementById('currentAge').textContent = rawAge + ' yrs';
+            document.getElementById('stableAge').textContent = stableAge + ' yrs';
+            document.getElementById('ageVariance').textContent = '±' + variance.toFixed(1);
+            document.getElementById('ageConfidence').textContent = confidence.toFixed(0) + '%';
+            document.getElementById('ageConfidenceBar').style.width = confidence + '%';
+            
+            // Show panel
+            document.getElementById('agePanel').style.display = 'block';
+            
+            return stableAge;
+        }
+
+        function resetAgeStabilizer() {
+            SystemState.ageStabilizer.samples = [];
+            SystemState.ageStabilizer.locked = null;
+            document.getElementById('ageVariance').textContent = '±0';
+            document.getElementById('ageConfidenceBar').style.width = '0%';
+            logEvent('Age stabilizer reset');
+        }
+
+        function lockAge() {
+            const current = document.getElementById('stableAge').textContent;
+            SystemState.ageStabilizer.locked = parseInt(current);
+            logEvent('Age locked: ' + current);
+        }
+
+        // Detection Visualization
+        function drawFaceOverlay() {
+            // Simulate face detection boxes
+            const numFaces = Math.floor(Math.random() * 2) + 1;
+            document.getElementById('detectionCount').textContent = numFaces;
+            
+            for (let i = 0; i < numFaces; i++) {
+                const x = 100 + Math.random() * (canvas.width - 300);
+                const y = 100 + Math.random() * (canvas.height - 300);
+                const w = 150 + Math.random() * 100;
+                const h = 200 + Math.random() * 50;
+                
+                // Draw detection box
+                ctx.strokeStyle = '#00ff88';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(x, y, w, h);
+                
+                // Draw label
+                ctx.fillStyle = '#00ff88';
+                ctx.fillRect(x, y - 20, 80, 20);
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 12px monospace';
+                ctx.fillText('FACE #' + (i + 1), x + 5, y - 5);
+                
+                // Simulate age detection with stabilization
+                if (SystemState.modules.face && Math.random() > 0.7) {
+                    const rawAge = 20 + Math.floor(Math.random() * 40);
+                    const stableAge = updateAgeDetection(rawAge);
+                    
+                    ctx.fillStyle = '#ffaa00';
+                    ctx.fillRect(x + 85, y - 20, 60, 20);
+                    ctx.fillStyle = '#000';
+                    ctx.fillText('Age: ' + stableAge, x + 90, y - 5);
+                }
+            }
+        }
+
+        // Analysis Control
+        function startAnalysis() {
+            const scanner = document.getElementById('scanner');
+            scanner.classList.remove('hidden');
+            
+            logEvent('Starting comprehensive biometric analysis...');
+            
+            setTimeout(() => {
+                scanner.classList.add('hidden');
+                generateResults();
+                logEvent('Analysis complete');
+            }, 3000);
+        }
+
+        function generateResults() {
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = '';
+            
+            const results = [
+                { label: 'Primary Subject', value: 'DETECTED', color: 'text-green-400' },
+                { label: 'Age (Stabilized)', value: document.getElementById('stableAge').textContent || '28 yrs', color: 'text-amber-400' },
+                { label: 'Gender', value: ['Male', 'Female'][Math.floor(Math.random() * 2)], color: 'text-cyan-400' },
+                { label: 'Confidence', value: (85 + Math.random() * 14).toFixed(1) + '%', color: 'text-pink-400' },
+                { label: 'Match Status', value: SystemState.database.connected ? 'SCANNING DB...' : 'NO DB', color: 'text-gray-400' }
+            ];
+            
+            results.forEach(r => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center p-2 rounded bg-black/40 border border-cyan-500/20';
+                div.innerHTML = `
+                    <span class="text-xs text-gray-400">${r.label}</span>
+                    <span class="text-sm font-mono-tech ${r.color}">${r.value}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Database Functions
+        function openDbModal() {
+            document.getElementById('dbModal').classList.remove('hidden');
+            document.getElementById('dbModal').classList.add('flex');
+        }
+
+        function closeDbModal() {
+            document.getElementById('dbModal').classList.add('hidden');
+            document.getElementById('dbModal').classList.remove('flex');
+        }
+
+        function updateDbOptions() {
+            const type = document.getElementById('dbType').value;
+            document.getElementById('folderInput').classList.toggle('hidden', type !== 'local');
+            document.getElementById('apiInput').classList.toggle('hidden', type !== 'rest');
+        }
+
+        async function handleFolderSelect(event) {
+            const files = Array.from(event.target.files);
+            const imageFiles = files.filter(f => f.type.startsWith('image/'));
+            
+            logEvent(`Selected ${imageFiles.length} images from folder`);
+            
+            // Create records from files
+            SystemState.database.records = imageFiles.map((file, idx) => ({
+                id: 'SUB-' + (1000 + idx),
+                name: file.name.replace(/\.[^/.]+$/, ""),
+                age: 20 + Math.floor(Math.random() * 40),
+                file: file
+            }));
+            
+            updateDbList();
+        }
+
+        function connectDatabase() {
+            SystemState.database.connected = true;
+            updateDbStatus();
+            closeDbModal();
+            document.getElementById('matchBtn').disabled = false;
+            logEvent('Database connected successfully');
+        }
+
+        function loadDatabase(type) {
+            if (type === 'json') {
+                // Simulate JSON load
+                const sampleData = [
+                    { id: 'SUB-1001', name: 'John Doe', age: 34, lastSeen: '2024-01-15' },
+                    { id: 'SUB-1002', name: 'Jane Smith', age: 28, lastSeen: '2024-01-14' },
+                    { id: 'SUB-1003', name: 'Mike Johnson', age: 45, lastSeen: '2024-01-16' }
+                ];
+                SystemState.database.records = sampleData;
+                SystemState.database.connected = true;
+                updateDbList();
+                updateDbStatus();
+                document.getElementById('matchBtn').disabled = false;
+                logEvent('JSON database loaded: ' + sampleData.length + ' records');
+            }
+        }
+
+        function updateDbList() {
+            const list = document.getElementById('dbList');
+            list.innerHTML = '';
+            
+            SystemState.database.records.forEach(record => {
+                const item = document.createElement('div');
+                item.className = 'db-item p-2 rounded text-xs flex justify-between items-center';
+                item.innerHTML = `
+                    <div>
+                        <div class="text-cyan-400 font-bold">${record.id}</div>
+                        <div class="text-gray-500">${record.name || 'Unknown'}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-gray-400">${record.age} yrs</div>
+                    </div>
+                `;
+                item.onclick = () => selectDbRecord(record, item);
+                list.appendChild(item);
+            });
+            
+            document.getElementById('recordCount').textContent = SystemState.database.records.length;
+        }
+
+        function selectDbRecord(record, element) {
+            SystemState.database.selected = record;
+            document.querySelectorAll('.db-item').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            logEvent('Selected record: ' + record.id);
+        }
+
+        function matchAgainstDb() {
+            if (!SystemState.database.connected) return;
+            
+            logEvent('Initiating database matching...');
+            
+            // Simulate matching
+            setTimeout(() => {
+                const match = SystemState.database.records[Math.floor(Math.random() * SystemState.database.records.length)];
+                logEvent(`Match found: ${match.id} (${match.name})`, 'success');
+                
+                // Update results
+                const container = document.getElementById('resultsContainer');
+                const matchDiv = document.createElement('div');
+                matchDiv.className = 'p-2 rounded bg-green-500/20 border border-green-500/50 mt-2';
+                matchDiv.innerHTML = `
+                    <div class="text-xs text-green-400 uppercase tracking-wider mb-1">Database Match</div>
+                    <div class="flex justify-between">
+                        <span class="text-white font-bold">${match.id}</span>
+                        <span class="text-green-400">98.4%</span>
+                    </div>
+                    <div class="text-xs text-gray-400">${match.name}</div>
+                `;
+                container.appendChild(matchDiv);
+            }, 1500);
+        }
+
+        function updateDbStatus() {
+            const dot = document.getElementById('dbStatus');
+            if (SystemState.database.connected) {
+                dot.className = 'status-dot status-online';
+            } else {
+                dot.className = 'status-dot status-offline';
+            }
+        }
+
+        // Utility Functions
+        function toggleModule(module, enabled) {
+            SystemState.modules[module] = enabled;
+            logEvent(`${module} module ${enabled ? 'enabled' : 'disabled'}`);
+        }
+
+        function changeQuality(quality) {
+            const qualities = { sd: '480p', hd: '720p', fhd: '1080p', '4k': '2160p' };
+            document.getElementById('qualityValue').textContent = qualities[quality];
+        }
+
+        function togglePause() {
+            SystemState.isPaused = !SystemState.isPaused;
+            document.getElementById('pauseBtn').innerHTML = SystemState.isPaused ? 
+                '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>' :
+                '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+            logEvent(SystemState.isPaused ? 'Processing paused' : 'Processing resumed');
+        }
+
+        function captureFrame() {
+            const link = document.createElement('a');
+            link.download = `nexus-capture-${Date.now()}.png`;
+            
+            // Create composite canvas
+            const composite = document.createElement('canvas');
+            composite.width = canvas.width;
+            composite.height = canvas.height;
+            const cctx = composite.getContext('2d');
+            
+            // Draw video/image
+            if (!video.classList.contains('hidden')) {
+                cctx.drawImage(video, 0, 0);
+            } else {
+                cctx.drawImage(imageEl, 0, 0);
+            }
+            
+            // Draw overlay
+            cctx.drawImage(canvas, 0, 0);
+            
+            link.href = composite.toDataURL();
+            link.click();
+            logEvent('Frame captured');
+        }
+
+        function recordVideo() {
+            SystemState.isRecording = !SystemState.isRecording;
+            const btn = document.getElementById('recordBtn');
+            if (SystemState.isRecording) {
+                btn.classList.add('active');
+                logEvent('Recording started');
+            } else {
+                btn.classList.remove('active');
+                logEvent('Recording stopped');
+            }
+        }
+
+        function emergencyStop() {
+            if (SystemState.stream) {
+                SystemState.stream.getTracks().forEach(track => track.stop());
+            }
+            SystemState.isPaused = true;
+            video.classList.add('hidden');
+            imageEl.classList.add('hidden');
+            document.getElementById('defaultState').classList.remove('hidden');
+            document.getElementById('analyzeBtn').disabled = true;
+            logEvent('EMERGENCY STOP - All systems halted', 'error');
+        }
+
+        function logEvent(message, type = 'info') {
+            const log = document.getElementById('eventLog');
+            const entry = document.createElement('div');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            
+            let color = 'text-gray-400';
+            if (type === 'error') color = 'text-red-400';
+            if (type === 'success') color = 'text-green-400';
+            
+            entry.className = `${color} border-l-2 border-current pl-2 my-1`;
+            entry.innerHTML = `<span class="opacity-50">[${time}]</span> ${message}`;
+            
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('eventLog').innerHTML = '';
+        }
+
+        function exportData() {
+            const data = SystemState.database.records.map(r => ({
+                ID: r.id,
+                Name: r.name,
+                Age: r.age,
+                Timestamp: new Date().toISOString()
+            }));
+            
+            const csv = convertToCSV(data);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = `nexus-export-${Date.now()}.csv`;
+            link.href = url;
+            link.click();
+            logEvent('Data exported to CSV');
+        }
+
+        function convertToCSV(objArray) {
+            const array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray;
+            let str = '';
+            
+            const header = Object.keys(array[0]).join(',') + '\r\n';
+            str += header;
+            
+            for (let i = 0; i < array.length; i++) {
+                let line = '';
+                for (let index in array[i]) {
+                    if (line !== '') line += ',';
+                    line += array[i][index];
+                }
+                str += line + '\r\n';
+            }
+            return str;
+        }
+
+        function showSettings() {
+            document.getElementById('settingsModal').classList.remove('hidden');
+            document.getElementById('settingsModal').classList.add('flex');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.add('hidden');
+            document.getElementById('settingsModal').classList.remove('flex');
+        }
+
+        function updateSetting(key, value) {
+            if (key === 'stabFrames') {
+                SystemState.settings.stabilizationFrames = parseInt(value);
+                SystemState.ageStabilizer.maxSamples = parseInt(value);
+                document.getElementById('stabFramesVal').textContent = value;
+            } else if (key === 'variance') {
+                SystemState.settings.acceptableVariance = parseInt(value);
+                SystemState.ageStabilizer.variance = parseInt(value);
+                document.getElementById('varianceVal').textContent = '±' + value + ' yrs';
+            }
+        }
+
+        function saveSettings() {
+            closeSettings();
+            logEvent('Settings saved');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                togglePause();
+            } else if (e.code === 'KeyS' && e.ctrlKey) {
+                e.preventDefault();
+                captureFrame();
+            }
+        });
+    </script>
 </body>
 </html>
